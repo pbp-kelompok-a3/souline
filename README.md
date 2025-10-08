@@ -23,5 +23,5 @@ WIP
 - WIP
 
 ## Tautan deployment PWS dan link design
-PWS: 
-Figma: https://www.figma.com/design/ql7AIQTcw69ICUzbf60xvR/souline?node-id=0-1&t=neB69mb4vch7VejF-1
+- PWS: https://pbp.cs.ui.ac.id/farrel.rifqi/souline
+- Figma: https://www.figma.com/design/ql7AIQTcw69ICUzbf60xvR/souline?node-id=0-1&t=neB69mb4vch7VejF-1
