@@ -10,17 +10,17 @@ Nama “SOULINE” diambil dari kata “SOUL” yang artinya jiwa, dan “LINE�
 - Farrel Rifqi Bagaskoro - 2406406780
 
 ## Daftar modul yang akan diimplementasikan
-### Studio
+### Studio (Faza)
 Modul yang digunakan untuk mencari studio terdekat di lingkup daerah Jabodetabek. Modul ini berisi detail studio yoga dan/atau pilates, termasuk data seperti nama studio, foto-foto di dalam studio, jam buka-tutup, rating dan reviews, serta link ke google maps. Modul ini juga memiliki fitur untuk melakukan booking sesuai dengan ketentuan dari studio masing masing, dapat melalui WhatsApp atau melalui link ke website langsung.
-### Sportswear 
+### Sportswear (Cheryl)
 Modul yang berguna untuk mencari sportswear yang akan membantu olahraga yoga dan/atau pilates, seperti diantaranya yoga pants, yoga clothes, yoga mat, dan sebagainya. Di modul ini akan ditampilkan brand-brand yang populer. Setiap brand akan memiliki tombol yang akan mengarah langsung ke online shop seperti Tokopedia/Shopee (atau keduanya) yang nantinya akan berguna bagi user agar segera membeli sportswear yang diinginkan.
-### Resources
+### Resources (Dillon)
 Modul ini akan memberikan panduan untuk memulai olahraga yoga dan/atau pilates. Panduan akan dibagi dari tingkat kesulitannya, dari yang baru mulai melakukan yoga dan/atau pilates hingga yang sudah ahli. Di modul ini akan diberikan sebuah video YouTube (melalui embed) kemudian ada paragraf penjelasan juga bagi yang tidak ingin menonton videonya. Tiap langkah akan dijelaskan secara mendetail agar tidak ada kesalahan dalam melakukan kegiatan olahraga.
-### User (profile)
+### User (profile) (Farrel)
 Sebuah modul yang akan menyimpan informasi pengguna saat ini. Modul ini sudah termasuk halaman register, login, dan fitur log out di halaman utama. Semua modul dalam website Souline akan memerlukan login, setiap user diperlukan untuk membuat akun untuk membuka website. Akun dapat dibuat dengan registrasi username dan password, dengan validasi password yang aman menggunakan implementasi dari Django. User juga diminta untuk memasukkan kota tempat tinggal saat ini untuk mempersonalisasikan pengalaman website berdasarkan lokasi (terutama modul studio).
-### Communities
+### Timeline (Adzradevany Aqiila)
 Modul yang dapat digunakan untuk membangun komunitas olahraga yoga dan pilates sesuai dengan minat dan hobi. Suatu komunitas akan mempunyai nama, deskripsi, dan foto yang merepresentasikan komunitas tersebut. Hubungan dari user ke komunitas adalah many-to-many, artinya satu user bisa mengikuti banyak komunitas dan satu komunitas bisa berisi banyak user. Pembuat dari suatu komunitas adalah owner dari komunitas tersebut, memiliki akses untuk menghapus komunitas secara permanen.
-### Events
+### Events (Aghnaya)
 Modul ini berguna untuk menginformasikan acara terkait olahraga yoga dan/atau pilates yang tersedia untuk diikuti saat ini. Modul akan menampilkan suatu timeline berisi acara-acara yang akan datang beserta tanggalnya. Informasi yang akan ditampilkan untuk setiap acara adalah nama acara, deskripsi, dan poster dari acara tersebut. Setiap event akan mempunyai gambar poster dan mekanisme pendaftarannya masing masing, misalnya dengan mengisi link Google Forms atau registrasi secara offline.
 
 ## Sumber initial dataset kategori utama produk
@@ -28,8 +28,8 @@ WIP
 
 ## Role atau peran pengguna beserta deskripsinya (karena bisa saja lebih dari satu jenis pengguna yang mengakses aplikasi)
 - Pengguna Umum : Orang yang ingin mencari studio Yoga atau Pilates, ingin belajar, atau ingin mencari rekomendasi Sportswear.
-- WIP
+- Admin : Orang yang mengelola aplikasi.
 
 ## Tautan deployment PWS dan link design
-- PWS: https://pbp.cs.ui.ac.id/farrel.rifqi/souline
+- PWS: https://farrel-rifqi-souline-pbp.cs.ui.ac.id/
 - Figma: https://www.figma.com/design/ql7AIQTcw69ICUzbf60xvR/souline?node-id=0-1&t=neB69mb4vch7VejF-1
