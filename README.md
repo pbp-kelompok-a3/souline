@@ -10,10 +10,12 @@ Nama “SOULINE” diambil dari kata “SOUL” yang artinya jiwa, dan “LINE�
 - Farrel Rifqi Bagaskoro - 2406406780
 
 ## Daftar modul yang akan diimplementasikan
-- Studio 
-- Sportswear 
-- Resources
-- WIP
+### Studio
+### Sportswear 
+### Resources
+### User (profile)
+### Communities
+### Events
 
 ## Sumber initial dataset kategori utama produk
 WIP
