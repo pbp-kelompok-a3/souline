@@ -13,12 +13,14 @@ Nama “SOULINE” diambil dari kata “SOUL” yang artinya jiwa, dan “LINE�
 - Studio 
 - Sportswear 
 - Resources
+- WIP
 
 ## Sumber initial dataset kategori utama produk
 WIP
 
 ## Role atau peran pengguna beserta deskripsinya (karena bisa saja lebih dari satu jenis pengguna yang mengakses aplikasi)
-- Pengguna Umum : Orang yang ingin mencari studio Yoga atau Pilates, ingin belajar, atau ingin mencari rekomendasi Sportswear. 
+- Pengguna Umum : Orang yang ingin mencari studio Yoga atau Pilates, ingin belajar, atau ingin mencari rekomendasi Sportswear.
+- WIP
 
 ## Tautan deployment PWS dan link design
 WIP
