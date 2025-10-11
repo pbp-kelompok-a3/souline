@@ -18,17 +18,13 @@ Modul yang berguna untuk mencari sportswear yang akan membantu olahraga yoga dan
 Modul ini akan memberikan panduan untuk memulai olahraga yoga dan/atau pilates. Panduan akan dibagi dari tingkat kesulitannya, dari yang baru mulai melakukan yoga dan/atau pilates hingga yang sudah ahli. Di modul ini akan diberikan sebuah video YouTube (melalui embed) kemudian ada paragraf penjelasan juga bagi yang tidak ingin menonton videonya. Tiap langkah akan dijelaskan secara mendetail agar tidak ada kesalahan dalam melakukan kegiatan olahraga.
 ### User (profile) (Farrel)
 Sebuah modul yang akan menyimpan informasi pengguna saat ini. Modul ini sudah termasuk halaman register, login, dan fitur log out di halaman utama. Semua modul dalam website Souline akan memerlukan login, setiap user diperlukan untuk membuat akun untuk membuka website. Akun dapat dibuat dengan registrasi username dan password, dengan validasi password yang aman menggunakan implementasi dari Django. User juga diminta untuk memasukkan kota tempat tinggal saat ini untuk mempersonalisasikan pengalaman website berdasarkan lokasi (terutama modul studio).
-### Timeline (Adzradevany Aqiila)
-Modul yang dapat digunakan untuk membangun komunitas olahraga yoga dan pilates sesuai dengan minat dan hobi. Suatu komunitas akan mempunyai nama, deskripsi, dan foto yang merepresentasikan komunitas tersebut. Hubungan dari user ke komunitas adalah many-to-many, artinya satu user bisa mengikuti banyak komunitas dan satu komunitas bisa berisi banyak user. Pembuat dari suatu komunitas adalah owner dari komunitas tersebut, memiliki akses untuk menghapus komunitas secara permanen.
-
+### Timeline (Lala)
+Modul ini memungkinkan pengguna untuk membuat post dalam bentuk teks dan/atau gambar untuk berbagi pengalaman, tips, atau konten seputar yoga dan pilates. Pengguna juga dapat mengedit dan menghapus post miliknya sendiri. Setiap postingan akan muncul di timeline dan bisa dilihat oleh semua user (seperti Twitter atau Instagram feed).
 ### Events (Aghnaya)
 Modul ini berguna untuk menginformasikan acara terkait olahraga yoga dan/atau pilates yang tersedia untuk diikuti. Modul akan menampilkan suatu timeline berisi acara-acara yang akan datang beserta tanggal dan lokasinya. Informasi yang akan ditampilkan untuk setiap acara adalah nama acara, deskripsi singkat, dan poster dari acara tersebut. Setiap event akan mempunyai gambar poster dan mekanisme pendaftarannya masing-masing, misalnya dengan mengisi link Google Forms atau registrasi secara offline. Informasi mengenai acara-acara ini kami dapatkan dari sosial media atau komunitas yang ada.
 
 ## Sumber initial dataset kategori utama produk
 [Dataset](https://github.com/pbp-kelompok-a3/souline/blob/aa663bd0609cfa5165a43fb26f251ec662d359fc/DataSet%20-%20List%20Pilates%20_%20Yoga%20Studio%20Jabodetabek%20(1).csv)
-
-_Source:_
-
 Sumber awal dataset studio yoga dan pilates kami peroleh dari hasil pengambilan data melalui Google Maps.
 
 ## Role atau peran pengguna beserta deskripsinya (karena bisa saja lebih dari satu jenis pengguna yang mengakses aplikasi)
