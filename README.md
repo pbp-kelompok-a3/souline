@@ -27,6 +27,11 @@ Modul ini berguna untuk menginformasikan acara terkait olahraga yoga dan/atau pi
 ## Sumber initial dataset kategori utama produk
 [Dataset](https://github.com/pbp-kelompok-a3/souline/blob/aa663bd0609cfa5165a43fb26f251ec662d359fc/DataSet%20-%20List%20Pilates%20_%20Yoga%20Studio%20Jabodetabek%20(1).csv)
 
+_Source:_
+
+https://www.google.com/maps/@-6.3705633,106.8296376,3903m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D
+
+
 ## Role atau peran pengguna beserta deskripsinya (karena bisa saja lebih dari satu jenis pengguna yang mengakses aplikasi)
 - Pengguna Umum : Orang yang ingin mencari studio Yoga atau Pilates, ingin belajar, atau ingin mencari rekomendasi Sportswear.
 - Admin : Orang yang mengelola aplikasi.
