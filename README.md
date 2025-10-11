@@ -29,8 +29,7 @@ Modul ini berguna untuk menginformasikan acara terkait olahraga yoga dan/atau pi
 
 _Source:_
 
-https://www.google.com/maps/@-6.3705633,106.8296376,3903m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D
-
+Sumber awal dataset studio yoga dan pilates kami peroleh dari hasil pengambilan data melalui Google Maps.
 
 ## Role atau peran pengguna beserta deskripsinya (karena bisa saja lebih dari satu jenis pengguna yang mengakses aplikasi)
 - Pengguna Umum : Orang yang ingin mencari studio Yoga atau Pilates, ingin belajar, atau ingin mencari rekomendasi Sportswear.
