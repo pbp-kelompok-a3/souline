@@ -1,0 +1,77 @@
+{% include "base.html" %}
+
+{% block meta %}
+<title>Studio List - Souline</title>
+{% endblock meta %}
+
+{% block content %}
+<h1>All Yoga/Pilates studios available, sorted by city</h1>
+
+{% if user.is_staff or user.is_superuser %}
+    <div class="admin-actions">
+        <a href="{% url 'add_studio' %}">+ Add New Studio</a>
+    </div>
+{% endif %}
+
+{% if has_user_city %}
+    <section class="city-section">
+        <h2>Studios in {{ user_kota }} (Your City)</h2>
+        <div>
+            {% for studio in user_kota_studios %}
+                <div>
+                    <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}">
+                    <h3>{{ studio.nama_studio }}</h3>
+                    <p>{{ studio.area }}, {{ studio.get_kota_display }}</p>
+                    <p>{{ studio.alamat }}</p>
+                    <p>{{ studio.nomor_telepon }}</p>
+                    <a href="{{ studio.gmaps_link }}">View on Google Maps</a>
+                </div>
+            {% empty %}
+                <p>No studios available in your city yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# Other cities #}
+    {% for city_data in cities_with_studios %}
+        <section class="city-section">
+            <h2>Studios in {{ city_data.name }}</h2>
+            <div>
+                {% for studio in city_data.studios %}
+                    <div>
+                        <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}">
+                        <h3>{{ studio.nama_studio }}</h3>
+                        <p>{{ studio.area }}, {{ studio.get_kota_display }}</p>
+                        <p>{{ studio.alamat }}</p>
+                        <p>{{ studio.nomor_telepon }}</p>
+                        <a href="{{ studio.gmaps_link }}">View on Google Maps</a>
+                    </div>
+                {% empty %}
+                    <p>No studios available in {{ city_data.name }} yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+{% else %}
+    {# For users without a city or anonymous users #}
+    {% for city_data in cities_with_studios %}
+        <section class="city-section">
+            <h2>Studios in {{ city_data.name }}</h2>
+            <div>
+                {% for studio in city_data.studios %}
+                    <div>
+                        <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}">
+                        <h3>{{ studio.nama_studio }}</h3>
+                        <p>{{ studio.area }}, {{ studio.get_kota_display }}</p>
+                        <p>{{ studio.alamat }}</p>
+                        <p>{{ studio.nomor_telepon }}</p>
+                        <a href="{{ studio.gmaps_link }}">View on Google Maps</a>
+                    </div>
+                {% empty %}
+                    <p>No studios available in {{ city_data.name }} yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+{% endif %}
+{% endblock content %}
