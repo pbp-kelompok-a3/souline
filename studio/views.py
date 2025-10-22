@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.core import serializers
 
+from users.models import UserProfile
+
 # Create your views here.
 
 def show_studio(request):
@@ -13,14 +15,17 @@ def show_studio(request):
     context = {}
     user_kota = None
 
-    if request.user.is_authenticated:
-        user_kota = request.user.profile.kota
-        if user_kota:
-            studios = Studio.objects.filter(kota=user_kota).order_by('nama_studio')
-            context['user_kota'] = user_kota
-            context['user_kota_studios'] = studios
-            context['has_user_city'] = True
-    else:
+    try:
+        if request.user.is_authenticated:
+            user_kota = request.user.profile.kota
+            if user_kota:
+                studios = Studio.objects.filter(kota=user_kota).order_by('nama_studio')
+                context['user_kota'] = user_kota
+                context['user_kota_studios'] = studios
+                context['has_user_city'] = True
+        else:
+            context['has_user_city'] = False
+    except UserProfile.DoesNotExist:
         context['has_user_city'] = False
 
     cities_with_studios = []

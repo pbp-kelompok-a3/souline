@@ -11,7 +11,7 @@
 
 <h1>Studio</h1>
 {% if user.is_authenticated and user_kota %}
-    <a href="{% url 'main:logout' %}">
+    <a href="{% url 'users:logout' %}">
     <button>Logout</button>
     </a>
     <h2>Studios in {{ user_kota }}</h2>

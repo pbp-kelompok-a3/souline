@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'main',
     'events',
     'studio',
+    'users',
 ]
 
 MIDDLEWARE = [
