@@ -34,7 +34,7 @@ GMAPS_API_KEY = os.getenv('GMAPS_API_KEY', '')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "farrel-rifqi-souline-pbp.cs.ui.ac.id"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "farrel-rifqi-souline.pbp.cs.ui.ac.id"]
 
 
 # Application definition

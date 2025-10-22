@@ -23,7 +23,7 @@ def register(request):
             
             # Redirect to login page
             messages.success(request, 'Registration successful. Please login.')
-            return redirect('main:login')
+            return redirect('users:login')
     else:
         form = CustomUserCreationForm()
     
@@ -48,7 +48,7 @@ def login_user(request):
     context = {'form': form}
     return render(request, 'login.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='users:login')
 def logout_user(request):
     logout(request)
-    return redirect('main:login')
+    return redirect('users:login')
