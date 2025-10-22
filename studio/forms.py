@@ -1,10 +1,5 @@
 from django.forms import ModelForm
-from main.models import UserProfile, Studio
-
-class UserProfileForm(ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ['kota']
+from studio.models import Studio
 
 class StudioForm(ModelForm):
     class Meta:
