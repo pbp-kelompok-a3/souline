@@ -7,12 +7,19 @@ from django.contrib import messages
 from main.models import UserProfile, Studio
 from main.forms import StudioForm
 
+# user stuff
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
+from main.forms import CustomUserCreationForm
+import datetime
+
 # Create your views here.
 
 # Cek apakah user adalah admin
 def is_admin(user):
     return user.is_superuser or user.is_staff
 
+@login_required(login_url='/login/')
 def show_main(request):
     context = {}
     user_kota = None
@@ -77,19 +84,47 @@ def add_studio(request):
     return render(request, 'add_studio.html', context)
 
 
-# Placeholder doang, tolong diganti pakai forms nanti
 def register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        kota = request.POST['kota']
-        
-        # Create user
-        user = User.objects.create_user(username=username, password=password)
-        
-        # Create profile
-        UserProfile.objects.create(user=user, kota=kota)
-        
-        return redirect('login')
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            # Save the user
+            user = form.save()
+            
+            # Get the kota from the POST data
+            kota = form.cleaned_data.get('kota')
+            
+            # Create the user profile
+            UserProfile.objects.create(user=user, kota=kota)
+            
+            # Redirect to login page
+            messages.success(request, 'Registration successful. Please login.')
+            return redirect('main:login')
+    else:
+        form = CustomUserCreationForm()
     
-    return render(request, 'register.html')
+    context = {'form': form}
+    return render(request, 'register.html', context)
+
+def login_user(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('main:main')
+            else:
+                messages.error(request, 'Invalid username or password.')
+    else:
+        form = AuthenticationForm()
+    
+    context = {'form': form}
+    return render(request, 'login.html', context)
+
+@login_required(login_url='/login/')
+def logout_user(request):
+    logout(request)
+    return redirect('main:login')
