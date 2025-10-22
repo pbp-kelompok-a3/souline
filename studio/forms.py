@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from main.models import Studio
+from studio.models import Studio
 
 class StudioForm(ModelForm):
     class Meta:
