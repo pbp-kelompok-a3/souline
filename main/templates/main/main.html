@@ -13,9 +13,13 @@
 <h2>Find your space to move and breathe</h2>
 {% if user.is_authenticated %}
     <a href="{% url 'users:logout' %}">
-    <button>Logout</button>
+        Logout
     </a>
     <h2>Studios in {{ user.profile.kota }}</h2>
+{% else %}
+    <a href="{% url 'users:login' %}">
+        Login
+    </a>
 {% endif %}
 
 <div>

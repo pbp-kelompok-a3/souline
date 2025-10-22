@@ -13,7 +13,6 @@ from users.models import UserProfile
 def is_admin(user):
     return user.is_superuser or user.is_staff
 
-@login_required(login_url='users:login')
 def show_main(request):
     context = {
         'user': request.user
