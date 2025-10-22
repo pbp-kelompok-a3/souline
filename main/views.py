@@ -13,12 +13,19 @@ from users.models import UserProfile
 def is_admin(user):
     return user.is_superuser or user.is_staff
 
-@login_required(login_url='/login/')
+@login_required(login_url='users:login')
 def show_main(request):
     context = {
-        'user': request.user,
-        'studios': Studio.objects.all().order_by('?')[:6],
+        'user': request.user
     }
+
+    if request.user.is_authenticated:
+        user_kota = request.user.profile.kota
+        if user_kota:
+            studios = Studio.objects.filter(kota=user_kota).order_by('?')[:6]
+            context['studios'] = studios
+    else:
+        context['studios'] = Studio.objects.all().order_by('?')[:6]
 
     return render(request, "main/main.html", context)
 
