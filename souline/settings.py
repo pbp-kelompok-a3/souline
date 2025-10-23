@@ -28,10 +28,13 @@ SECRET_KEY = 'django-insecure-f6ozgf$kzxa6jf$0phi0*rakyrj1zsr#22)(d@&esdidnn=b+&
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
+# Google Maps API Key
+GMAPS_API_KEY = os.getenv('GMAPS_API_KEY', '')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "farrel-rifqi-souline.pbp.cs.ui.ac.id"]
 
 
 # Application definition
@@ -45,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'events',
+    'studio',
+    'users',
     'sportswear',
 ]
 

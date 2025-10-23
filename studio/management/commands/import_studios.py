@@ -1,6 +1,9 @@
 import csv
+import time
+import googlemaps
 from django.core.management.base import BaseCommand
-from main.models import Studio
+from django.conf import settings
+from studio.models import Studio
 from pathlib import Path
 
 
@@ -15,6 +18,14 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Initialize Google Maps client
+        api_key = settings.GMAPS_API_KEY
+        if not api_key:
+            self.stdout.write(self.style.ERROR('Google Maps API key not found in settings'))
+            return
+        
+        gmaps = googlemaps.Client(key=api_key)
+        
         # Path to CSV file
         csv_file = Path(__file__).resolve().parent.parent.parent.parent / 'DataSet - List Pilates _ Yoga Studio Jabodetabek (1).csv'
         
@@ -79,6 +90,14 @@ class Command(BaseCommand):
                     skipped_count += 1
                     continue
                 
+                # Fetch Google Places data
+                thumbnail_url, gmaps_link = self.fetch_place_data(
+                    gmaps, api_key, nama_studio, kota, area
+                )
+                
+                # Add delay to respect API rate limits
+                time.sleep(1)
+                
                 # Create studio
                 try:
                     Studio.objects.create(
@@ -87,6 +106,8 @@ class Command(BaseCommand):
                         area=area,
                         alamat=alamat,
                         nomor_telepon=nomor_telepon,
+                        thumbnail=thumbnail_url,
+                        gmaps_link=gmaps_link,
                     )
                     imported_count += 1
                     self.stdout.write(
@@ -103,3 +124,53 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Successfully imported: {imported_count} studios'))
         if skipped_count > 0:
             self.stdout.write(self.style.WARNING(f'Skipped: {skipped_count} studios'))
+    
+    def fetch_place_data(self, gmaps, api_key, nama_studio, kota, area):
+        """
+        Fetch thumbnail and Google Maps link for a studio using Google Places API
+        """
+        placeholder_image = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+        
+        try:
+            # Search query for better accuracy
+            query = f"{nama_studio} pilates yoga {kota} Indonesia"
+            
+            # Find place using Places API
+            places_result = gmaps.places(query=query)
+            
+            if places_result['status'] == 'OK' and places_result['results']:
+                place = places_result['results'][0]
+                place_id = place.get('place_id')
+                
+                thumbnail_url = placeholder_image
+                gmaps_link = f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}"
+                
+                # Get photo from initial result
+                if 'photos' in place and place['photos']:
+                    photo_reference = place['photos'][0]['photo_reference']
+                    # Construct photo URL (max width 400px for thumbnails)
+                    thumbnail_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={photo_reference}&key={api_key}"
+                
+                # Get place details for Google Maps URL
+                place_details = gmaps.place(place_id=place_id, fields=['url'])
+                
+                # Get Google Maps link
+                if place_details['status'] == 'OK' and 'url' in place_details['result']:
+                    gmaps_link = place_details['result']['url']
+                
+                self.stdout.write(
+                    self.style.SUCCESS(f'  -> Found place data for {nama_studio}')
+                )
+                return thumbnail_url, gmaps_link
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f'  -> Place not found for {nama_studio}, using placeholder')
+                )
+                return placeholder_image, f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}"
+                
+        except Exception as e:
+            self.stdout.write(
+                self.style.WARNING(f'  -> Error fetching place data for {nama_studio}: {str(e)}')
+            )
+            query = f"{nama_studio} {kota} Indonesia"
+            return placeholder_image, f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}"

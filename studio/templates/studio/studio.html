@@ -9,7 +9,7 @@
 
 {% if user.is_staff or user.is_superuser %}
     <div class="admin-actions">
-        <a href="{% url 'add_studio' %}">+ Add New Studio</a>
+        <a href="{% url 'studio:add_studio' %}">+ Add New Studio</a>
     </div>
 {% endif %}
 
@@ -19,12 +19,12 @@
         <div>
             {% for studio in user_kota_studios %}
                 <div>
-                    <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}">
+                    <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}" width="400" height="300">
                     <h3>{{ studio.nama_studio }}</h3>
                     <p>{{ studio.area }}, {{ studio.get_kota_display }}</p>
                     <p>{{ studio.alamat }}</p>
                     <p>{{ studio.nomor_telepon }}</p>
-                    <a href="{{ studio.gmaps_link }}">View on Google Maps</a>
+                    <a href="{{ studio.gmaps_link }}" target="_blank">View on Google Maps</a>
                 </div>
             {% empty %}
                 <p>No studios available in your city yet.</p>
@@ -39,12 +39,12 @@
             <div>
                 {% for studio in city_data.studios %}
                     <div>
-                        <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}">
+                        <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}" width="400" height="300">
                         <h3>{{ studio.nama_studio }}</h3>
                         <p>{{ studio.area }}, {{ studio.get_kota_display }}</p>
                         <p>{{ studio.alamat }}</p>
                         <p>{{ studio.nomor_telepon }}</p>
-                        <a href="{{ studio.gmaps_link }}">View on Google Maps</a>
+                        <a href="{{ studio.gmaps_link }}" target="_blank">View on Google Maps</a>
                     </div>
                 {% empty %}
                     <p>No studios available in {{ city_data.name }} yet.</p>
@@ -60,12 +60,12 @@
             <div>
                 {% for studio in city_data.studios %}
                     <div>
-                        <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}">
+                        <img src="{{ studio.thumbnail }}" alt="{{ studio.nama_studio }}" width="400" height="300">
                         <h3>{{ studio.nama_studio }}</h3>
                         <p>{{ studio.area }}, {{ studio.get_kota_display }}</p>
                         <p>{{ studio.alamat }}</p>
                         <p>{{ studio.nomor_telepon }}</p>
-                        <a href="{{ studio.gmaps_link }}">View on Google Maps</a>
+                        <a href="{{ studio.gmaps_link }}" target="_blank">View on Google Maps</a>
                     </div>
                 {% empty %}
                     <p>No studios available in {{ city_data.name }} yet.</p>
