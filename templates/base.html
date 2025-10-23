@@ -1,14 +1,35 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% block meta %} {% endblock meta %}
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+    {% block meta %}
+    <title>{% block title %}SoulLine App{% endblock title %}</title>
+    {% endblock meta %}
+    
+        <script src="https://cdn.tailwindcss.com"></script> 
+
+        <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'body-bg': '#FFFBF0',        // Latar belakang utama (Light Beige)
+              'card-bg': '#FFF7DD',        // Latar belakang card (Beige)
+              'dark-blue': '#446178',      // Judul ("Sportswear")
+              'highlight-orange': '#FFA04D', // Subjudul ("Stay Active. Stay Stylish.")
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body>
-    {% block content %} {% endblock content %}
-  </body>
+    <body class="bg-body-bg">
+    
+        {% block content %} {% endblock content %}
+
+      </body>
 </html>

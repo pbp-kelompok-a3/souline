@@ -1,0 +1,97 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block title %}Sportswear | Souline{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-12 px-6">
+    
+    <div class="text-left mb-8">
+        <h1 class="text-5xl font-extrabold text-dark-blue">Sportswear</h1>
+        <p class="text-xl mt-1 mb-3 font-semibold text-highlight-orange">Stay Active. Stay Stylish.</p>
+    </div>
+
+    <div class="flex flex-col items-center mb-10">
+        
+        <div class="w-full max-w-xl relative mb-4">
+            <input type="text" id="search-input" 
+                   class="w-full py-3 pl-5 pr-12 rounded-full border border-gray-300 shadow-sm 
+                          focus:outline-none focus:ring-2 focus:ring-highlight-orange focus:border-highlight-orange" 
+                   placeholder="Cari brand atau deskripsi..." 
+                   onkeyup="filterBrands()">
+            
+            <span class="absolute right-0 top-0 h-full flex items-center pr-4 text-gray-500" style="z-index: 10;">
+                🔍
+            </span>
+        </div>
+        
+        {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'sportswear:add_brand' %}" 
+               class="px-6 py-2 border border-blue-300 text-blue-400 rounded-lg hover:bg-blue-50 transition duration-150 ease-in-out text-sm font-medium">
+                Add Brand
+            </a>
+        {% endif %}
+        
+    </div>
+
+    <div id="brand-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% include 'sportswear/brand_cards.html' with brands=brands %}
+    </div>
+</div>
+
+<script>
+    const container = document.getElementById('brand-list-container');
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value; 
+
+    function filterBrands() {
+        const query = document.getElementById('search-input').value;
+        container.innerHTML = '<div class="col-span-2 text-center p-10"><p class="text-gray-500">Memuat...</p></div>';
+
+        fetch(`/sportswear/filter_ajax/?q=${query}`, {
+             method: 'GET',
+             headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(response => response.text())
+        .then(html => {
+            container.innerHTML = html; 
+            setupDeleteListeners();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            container.innerHTML = '<div class="col-span-2 text-center p-10"><p class="text-red-500">❌ Gagal memuat data.</p></div>';
+        });
+    }
+
+    function deleteBrand(brandId) {
+        if (!confirm("Hapus Brand ini? Aksi ini permanen.")) return;
+
+        fetch(`/sportswear/delete/${brandId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById(`brand-card-${brandId}`).remove();
+                alert('Brand berhasil dihapus!');
+            } else {
+                alert('Gagal menghapus brand. Pastikan Anda Admin.');
+            }
+        })
+        .catch(error => console.error('Error deleting brand:', error));
+    }
+    
+    function setupDeleteListeners() {
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.onclick = (e) => {
+                e.preventDefault(); 
+                deleteBrand(button.getAttribute('data-id'));
+            };
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', setupDeleteListeners);
+</script>
+{% endblock %}
