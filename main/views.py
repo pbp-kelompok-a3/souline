@@ -18,11 +18,9 @@ def show_main(request):
         'user': request.user
     }
 
-    if request.user.is_authenticated:
-        user_kota = request.user.profile.kota
-        if user_kota:
-            studios = Studio.objects.filter(kota=user_kota).order_by('?')[:10]
-            context['studios'] = studios
+    if request.user.is_authenticated and request.user.profile.kota:
+        studios = Studio.objects.filter(kota=request.user.profile.kota).order_by('?')[:10]
+        context['studios'] = studios
     else:
         context['studios'] = Studio.objects.all().order_by('?')[:10]
 
