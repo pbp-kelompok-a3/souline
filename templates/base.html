@@ -7,8 +7,37 @@
     {% block meta %} {% endblock meta %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              poppins: ["Poppins", "sans-serif"],
+            },
+            colors: {
+              darkblue : "#446178",
+              lightblue : "#8BC4DA",
+              lightbeige: "#FFFBF0",
+              beige: "#FFF7DD",
+              orange: "#FFA04D",
+              lightgreen: "#B4DEBD",
+
+
+            },
+            fontSize: {
+              64: "64px",
+              32: "32px",
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
+  <body class="font-poppins">
     {% block content %} {% endblock content %}
   </body>
 </html>
