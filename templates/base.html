@@ -1,23 +1,15 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     {% block meta %}
-     <title>{% block title %}SoulLine App{% endblock title %}</title>
-     {% endblock meta %}
-     
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-     
-        <script src="https://cdn.tailwindcss.com"></script> 
-    <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
-     
-        <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-      }
-    </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% block meta %}
+    <title>{% block title %}SoulLine App{% endblock title %}</title>
+    {% endblock meta %}
+    <link rel="icon" type="image/x-icon" href="{% static 'image/logo.png' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}?v=2"/>
     <script>
       tailwind.config = {
         theme: {

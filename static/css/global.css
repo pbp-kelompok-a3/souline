@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* === GLOBAL STYLE === */
 body {
   font-family: 'Poppins', sans-serif;
   background-color: #FFF9F1;
   color: #2E4057;
+  min-height: 100vh;
 }
 
 /* Headings */
@@ -67,4 +70,59 @@ a, button {
 }
 .add-btn:hover {
   background-color: #ff9e1c;
+}
+
+/* === STUDIO STYLES === */
+/* Carousel scroll behavior */
+.cards-wrapper {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: #91C4C3 #FFF7DD;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cards-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cards-wrapper::-webkit-scrollbar-track {
+  background: #FFF7DD;
+  border-radius: 10px;
+}
+
+.cards-wrapper::-webkit-scrollbar-thumb {
+  background: #91C4C3;
+  border-radius: 10px;
+}
+
+.cards-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #446178;
+}
+
+/* Scroll gradient shadows */
+.carousel-container::before,
+.carousel-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.carousel-container::before {
+  left: 0;
+  background: linear-gradient(to right, #FFF9F1, transparent);
+}
+
+.carousel-container::after {
+  right: 0;
+  background: linear-gradient(to left, #FFF9F1, transparent);
+}
+
+/* Studio card snap alignment */
+.studio-card {
+  scroll-snap-align: start;
 }
