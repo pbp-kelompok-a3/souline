@@ -23,4 +23,5 @@ urlpatterns = [
     path('studio/', include('studio.urls')),
     path('events/', include('events.urls')),
     path('users/', include('users.urls')),
+    path('sportswear/', include('sportswear.urls')),
 ]
