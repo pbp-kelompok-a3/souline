@@ -21,10 +21,10 @@ def show_main(request):
     if request.user.is_authenticated:
         user_kota = request.user.profile.kota
         if user_kota:
-            studios = Studio.objects.filter(kota=user_kota).order_by('?')[:6]
+            studios = Studio.objects.filter(kota=user_kota).order_by('?')[:10]
             context['studios'] = studios
     else:
-        context['studios'] = Studio.objects.all().order_by('?')[:6]
+        context['studios'] = Studio.objects.all().order_by('?')[:10]
 
     return render(request, "main/main.html", context)
 
