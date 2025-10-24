@@ -1,13 +1,15 @@
-from datetime import date, timedelta, timezone
+from datetime import date, timedelta
+from django.utils import timezone
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Event
 from .forms import EventForm
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core import serializers
 
 from users.models import UserProfile
+
 
 def show_events(request):
     filter_type = request.GET.get('filter')  # 'soon' or 'later'
@@ -26,16 +28,18 @@ def show_events(request):
         'filter_type': filter_type,
     })
 
+
 @login_required(login_url='/login/')
 def add_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('event_list')
+            return redirect('events:event_list')
     else:
         form = EventForm()
     return render(request, 'events/add_event.html', {'form': form})
+
 
 def show_json(request):
     events = Event.objects.all().order_by('date')
@@ -48,8 +52,10 @@ def show_json(request):
     } for e in events]
     return JsonResponse(data, safe=False)
 
+
 def show_json_filtered(request, filter_type):
     today = timezone.now().date()
+
     if filter_type == "soon":
         events = Event.objects.filter(date__gte=today, date__lte=today + timedelta(days=7))
     elif filter_type == "later":
