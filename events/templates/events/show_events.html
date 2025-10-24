@@ -37,12 +37,13 @@
       {% for event in events %}
         <div class="event-card w-80 p-6 flex flex-col items-center text-center">
           {% if event.poster %}
-            <img src="{{ event.poster.url }}" alt="{{ event.name }}" class="event-poster mb-4">
+            <img src="{{ event.poster.url }}" alt="{{ event.name }}" class="rounded-t-xl w-full h-48 object-cover">
           {% else %}
-            <div class="event-side flex items-center justify-center mb-4 text-gray-400">
-              No Image
+            <div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400">
+              No image
             </div>
           {% endif %}
+
 
           <h2 class="font-semibold text-xl text-[#2E4057]">{{ event.name }}</h2>
           <p class="event-date mt-1">{{ event.date|date:"d F Y" }}</p>

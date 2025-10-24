@@ -5,6 +5,7 @@ class Event(models.Model):
     description = models.TextField()
     date = models.DateField()
     poster = models.ImageField(upload_to='event_posters/', blank=True, null=True)
+    
 
     def __str__(self):
         return self.name
