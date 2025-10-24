@@ -26,7 +26,7 @@
                             </a>
                             <button class="delete-btn text-xs font-semibold px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10" 
                                     data-id="{{ brand.pk }}">
-                                🗑️ Hapus
+                                🗑️ Delete
                             </button>
                         </div>
                     {% endif %}
@@ -35,6 +35,6 @@
         </a> </div>
 {% empty %}
     <div class="col-span-2">
-        <p class="text-center text-dark-blue p-10">Tidak ada brand yang ditemukan.</p>
+        <p class="text-center text-dark-blue p-10"> No brand found.</p>
     </div>
 {% endfor %}

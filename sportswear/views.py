@@ -54,7 +54,7 @@ def add_brand(request):
     else:
         form = SportswearBrandForm()
         
-    return render(request, 'sportswear/add_edit_brand.html', {'form': form, 'title': 'Tambah Brand'})
+    return render(request, 'sportswear/add_edit_brand.html', {'form': form, 'title': 'Add New Brand'})
 
 @login_required
 def edit_brand(request, pk):
