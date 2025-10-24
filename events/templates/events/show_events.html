@@ -15,7 +15,7 @@
     </div>
 
     <!-- Grid of event cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="events-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for event in events %}
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
             {% if event.poster %}
@@ -44,6 +44,7 @@
 </div>
 
 <!-- AJAX -->
+{# 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const select = document.getElementById('filter-select');
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+#}
 
 {% include "footer.html" %}
 {% endblock %}
