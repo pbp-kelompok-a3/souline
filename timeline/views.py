@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
-
+from django.template.loader import render_to_string
 from .forms import PostForm, CommentForm
 from .models import Post, Comment
 
@@ -74,3 +74,31 @@ def post_detail(request, pk):
     post = get_object_or_404(Post.objects.select_related('author').prefetch_related('comments__author', 'likes'), pk=pk)
     comment_form = CommentForm()
     return render(request, 'post_detail.html', {'post': post, 'comment_form': comment_form})
+
+@login_required
+@require_POST
+def edit_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if post.author != request.user:
+        return JsonResponse({'success': False, 'error': 'permission_denied'}, status=403)
+
+    text = request.POST.get('text', '').strip()
+    if not text:
+        return JsonResponse({'success': False, 'error': 'empty_text'}, status=400)
+
+    post.text = text
+    post.save()
+
+    html = render_to_string('_post.html', {'post': post, 'user': request.user}, request=request)
+    return JsonResponse({'success': True, 'html': html})
+
+
+@login_required
+@require_POST
+def delete_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if post.author != request.user:
+        return JsonResponse({'success': False, 'error': 'permission_denied'}, status=403)
+
+    post.delete()
+    return JsonResponse({'success': True})
