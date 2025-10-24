@@ -22,7 +22,6 @@
         <option value="later">Coming Later (after 7 days)</option>
       </select>
       
-      <!-- Custom dropdown icon -->
       <svg class="w-5 h-5 text-[#F48C06] absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -35,19 +34,27 @@
   <div id="events-container" class="event-wrapper max-w-6xl justify-start md:justify-center">
     {% if events %}
       {% for event in events %}
-        <div class="event-card w-80 p-6 flex flex-col items-center text-center">
+        <div class="event-card w-80 p-6 flex flex-col items-center text-center bg-white shadow-md rounded-2xl mb-8">
           {% if event.poster %}
-            <img src="{{ event.poster.url }}" alt="{{ event.name }}" class="rounded-t-xl w-full h-48 object-cover">
+            <img src="{{ event.poster.url }}" alt="{{ event.name }}" class="rounded-t-xl w-full h-48 object-cover mb-4">
           {% else %}
-            <div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400">
+            <div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400 mb-4">
               No image
             </div>
           {% endif %}
 
-
           <h2 class="font-semibold text-xl text-[#2E4057]">{{ event.name }}</h2>
-          <p class="event-date mt-1">{{ event.date|date:"d F Y" }}</p>
+          <p class="event-date mt-1 text-gray-500">{{ event.date|date:"d F Y" }}</p>
           <p class="text-gray-600 mt-3 text-sm text-center">{{ event.description|truncatechars:100 }}</p>
+
+          {% if user.is_staff %}
+          <div class="flex justify-center space-x-3 mt-4">
+            <a href="{% url 'events:edit_event' event.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600">Edit</a>
+            <a href="{% url 'events:delete_event' event.id %}" 
+               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" 
+               onclick="return confirm('Yakin mau hapus event ini?');">Delete</a>
+          </div>
+          {% endif %}
         </div>
       {% endfor %}
     {% else %}
@@ -63,6 +70,7 @@
     </a>
   </div>
   {% endif %}
+</div>
 
 <!-- AJAX -->
 <script>
@@ -84,11 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         data.forEach(event => {
           const card = `
-            <div class="event-card w-80 p-6 flex flex-col items-center text-center">
-              ${event.poster ? `<img src="${event.poster}" class="event-poster mb-4">`
-                              : `<div class="event-side flex items-center justify-center mb-4 text-gray-400">No Image</div>`}
+            <div class="event-card w-80 p-6 flex flex-col items-center text-center bg-white shadow-md rounded-2xl mb-8">
+              ${event.poster ? `<img src="${event.poster}" class="rounded-t-xl w-full h-48 object-cover mb-4">`
+                              : `<div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400 mb-4">No Image</div>`}
               <h2 class="font-semibold text-xl text-[#2E4057]">${event.name}</h2>
-              <p class="event-date mt-1">${event.date}</p>
+              <p class="event-date mt-1 text-gray-500">${event.date}</p>
               <p class="text-gray-600 mt-3 text-sm text-center">${event.description}</p>
             </div>`;
           container.insertAdjacentHTML('beforeend', card);
