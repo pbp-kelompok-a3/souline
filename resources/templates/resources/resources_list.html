@@ -1,107 +1,113 @@
 {% extends 'base.html' %}
+
+{% block title %}Resources | SoulLine{% endblock title %}
+
 {% block content %}
-{% include "header.html" %}
-<div class="min-h-screen bg-[#FFFBF0] py-10">
-  <div class="max-w-6xl mx-auto px-4">
-    <h1 class="text-3xl font-bold text-left mb-8 text-gray-800"
-        style="font-family: 'Poppins', sans-serif; font-size: 64px; color: #446178;">
-      Guide on your journey
-    </h1>
+  {% include "header.html" %}
 
-    <h2 class="text-3xl font-semibold text-orange mb-8 text-gray-800"
-        style="font-family: 'Poppins', sans-serif; font-size: 32px; ">
-      Stay Active. Stay Stylish.
-    </h2>
+  <!-- Konten utama -->
+  <div class="min-h-screen bg-body-bg py-10 mt-20"> <!-- mt-20 supaya header sticky ga nutup konten -->
+    <div class="max-w-6xl mx-auto px-4">
 
-    <div class="flex justify-end mb-6">
-      <a href="{% url 'resources:resource_form_page' %}">
-        <button class="bg-[#FFFBF0] border-2 border-lightblue text-lightblue font-semibold px-5 py-2 rounded-lg shadow-md"
-        style="font-family: 'Poppins'">
-          + Tambah Video
-        </button>
-      </a>
+      <!-- Judul -->
+      <h1 class="text-3xl font-bold mb-8 text-gray-800"
+          style="font-family: 'Poppins', sans-serif; font-size: 64px; color: #446178;">
+        Guide on your journey
+      </h1>
+
+      <h2 class="text-3xl font-semibold text-orange mb-8 text-gray-800"
+          style="font-family: 'Poppins', sans-serif; font-size: 32px;">
+        A guide to discovering your strength.
+      </h2>
+
+      <!-- Tombol Tambah Video -->
+      <div class="flex justify-end mb-6">
+        <a href="{% url 'resources:resource_form_page' %}">
+          <button class="bg-lightbeige border-2 border-lightblue text-lightblue font-semibold px-5 py-2 rounded-lg shadow-md"
+                  style="font-family: 'Poppins'">
+            + Tambah Video
+          </button>
+        </a>
+      </div>
+
+      <!-- Resource List -->
+      <div id="resource-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </div>
-
-    <div id="resource-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
   </div>
-</div>
 
-<script>
-  async function loadResources() {
-    const response = await fetch('/resources/api/');
-    const resources = await response.json();
-    const listContainer = document.getElementById('resource-list');
-    listContainer.innerHTML = '';
+  <script>
+    async function loadResources() {
+      const response = await fetch('/resources/api/');
+      const resources = await response.json();
+      const listContainer = document.getElementById('resource-list');
+      listContainer.innerHTML = '';
 
-    resources.forEach(r => {
-      const videoId = r.video_id;
+      resources.forEach(r => {
+        const videoId = r.video_id;
 
-      // 🎨 Pilih warna badge berdasarkan level
-      let badgeColor = "";
-      if (r.level === "beginner") {
-        badgeColor = "bg-green-200 text-green-800";
-      } else if (r.level === "intermediate") {
-        badgeColor = "bg-yellow-200 text-yellow-800";
-      } else if (r.level === "advanced") {
-        badgeColor = "bg-violet-200 text-violet-800";
-      }
+        const shortDesc = r.description.length > 100
+          ? r.description.substring(0, 100) + '...'
+          : r.description;
+
+        let badgeColor = "";
+        if (r.level === "beginner") badgeColor = "bg-green-200 text-green-800";
+        else if (r.level === "intermediate") badgeColor = "bg-yellow-200 text-yellow-800";
+        else if (r.level === "advanced") badgeColor = "bg-violet-200 text-violet-800";
 
         listContainer.innerHTML += `
-    <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
-        <iframe 
-        class="w-full h-56"
-        src="https://www.youtube.com/embed/${videoId}" 
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-        ></iframe>
-        
-        <div class="p-4 flex flex-col flex-grow">
-        <a href="/resources/${r.id}/">
-            <h3 class="text-lg font-semibold text-gray-800 hover:text-lightgreen transition-colors duration-200">
-            ${r.title}
-            </h3>
-        </a>
-        <p class="text-gray-600 text-sm mt-2 flex-grow">${r.description}</p>
+          <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+            <iframe class="w-full h-56"
+                    src="https://www.youtube.com/embed/${videoId}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
 
-        <div class="flex justify-between items-center mt-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold ${badgeColor}">
-            ${r.level.charAt(0).toUpperCase() + r.level.slice(1)}
-            </span>
-            <div class="flex gap-2">
-            <a href="/resources/edit/${r.id}/">
-                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                Edit
-                </button>
-            </a>
-            <button onclick="deleteResource(${r.id})"
-                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                Hapus
-            </button>
+            <div class="p-4 flex flex-col flex-grow">
+              <a href="/resources/${r.id}/">
+                <h3 class="text-lg font-semibold text-gray-800 hover:text-lightgreen transition-colors duration-200">
+                  ${r.title}
+                </h3>
+              </a>
+              <p class="text-gray-600 text-sm mt-2 flex-grow">${shortDesc}</p>
+
+              <div class="flex justify-between items-center mt-4">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold ${badgeColor}">
+                  ${r.level.charAt(0).toUpperCase() + r.level.slice(1)}
+                </span>
+                <div class="flex gap-2">
+                  <a href="/resources/edit/${r.id}/">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium">
+                      Edit
+                    </button>
+                  </a>
+                  <button onclick="deleteResource(${r.id})"
+                          class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-medium">
+                    Hapus
+                  </button>
+                </div>
+              </div>
             </div>
-        </div>
-        </div>
-    </div>
-    `;
-    });
-  }
-
-  async function deleteResource(id) {
-    if (!confirm("Apakah kamu yakin ingin menghapus video ini?")) return;
-
-    const response = await fetch(`/resources/api/delete/${id}/`, {
-      method: "POST"
-    });
-
-    const result = await response.json();
-    if (result.status === "deleted") {
-      alert("Video berhasil dihapus!");
-      loadResources();
-    } else {
-      alert("Terjadi kesalahan saat menghapus.");
+          </div>
+        `;
+      });
     }
-  }
 
-  loadResources();
-</script>
+    async function deleteResource(id) {
+      if (!confirm("Apakah kamu yakin ingin menghapus video ini?")) return;
+
+      const response = await fetch(`/resources/api/delete/${id}/`, {
+        method: "POST"
+      });
+
+      const result = await response.json();
+      if (result.status === "deleted") {
+        alert("Video berhasil dihapus!");
+        loadResources();
+      } else {
+        alert("Terjadi kesalahan saat menghapus.");
+      }
+    }
+
+    loadResources();
+  </script>
 {% endblock %}
