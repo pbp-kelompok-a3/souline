@@ -20,20 +20,28 @@
         A guide to discovering your strength.
       </h2>
 
-      <!-- Tombol Tambah Video -->
-      <div class="flex justify-end mb-6">
-        <a href="{% url 'resources:resource_form_page' %}">
-          <button class="bg-lightbeige border-2 border-lightblue text-lightblue font-semibold px-5 py-2 rounded-lg shadow-md"
-                  style="font-family: 'Poppins'">
-            + Tambah Video
-          </button>
-        </a>
-      </div>
+      <!-- Tombol Tambah Video (khusus staff/admin) -->
+      {% if user.is_staff or user.is_superuser %}
+        <div class="flex justify-end mb-6">
+          <a href="{% url 'resources:resource_form_page' %}">
+            <button class="bg-lightbeige border-2 border-lightblue text-lightblue font-semibold px-5 py-2 rounded-lg shadow-md"
+                    style="font-family: 'Poppins'">
+              + Tambah Video
+            </button>
+          </a>
+        </div>
+      {% endif %}
 
       <!-- Resource List -->
       <div id="resource-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </div>
   </div>
+
+  <!-- kirim status user ke JS -->
+  <script>
+   const isStaff = "{{ user.is_staff|yesno:'true,false' }}" === "true";
+   const isSuperuser = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+  </script>
 
   <script>
     async function loadResources() {
@@ -54,6 +62,7 @@
         else if (r.level === "intermediate") badgeColor = "bg-yellow-200 text-yellow-800";
         else if (r.level === "advanced") badgeColor = "bg-violet-200 text-violet-800";
 
+        // Bagian HTML utama tiap resource
         listContainer.innerHTML += `
           <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
             <iframe class="w-full h-56"
@@ -74,17 +83,20 @@
                 <span class="px-3 py-1 rounded-full text-xs font-semibold ${badgeColor}">
                   ${r.level.charAt(0).toUpperCase() + r.level.slice(1)}
                 </span>
-                <div class="flex gap-2">
-                  <a href="/resources/edit/${r.id}/">
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                      Edit
+
+                ${(isStaff || isSuperuser) ? `
+                  <div class="flex gap-2">
+                    <a href="/resources/edit/${r.id}/">
+                      <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium">
+                        Edit
+                      </button>
+                    </a>
+                    <button onclick="deleteResource(${r.id})"
+                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-medium">
+                      Hapus
                     </button>
-                  </a>
-                  <button onclick="deleteResource(${r.id})"
-                          class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                    Hapus
-                  </button>
-                </div>
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>
