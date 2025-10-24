@@ -2,31 +2,170 @@
 
 {% block meta %}
 <title>Register</title>
+<style>
+    .register-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #FFFBF0;
+        font-family: Arial, sans-serif;
+    }
+
+    .register-box {
+        background-color: #FFFFFF;
+        padding: 50px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 800px;
+        margin: 20px;
+    }
+
+    .register-box h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .register-box p {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .register-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #446178;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .register-btn:hover {
+        background-color: #3e586d;
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .messages li {
+        color: #dc3545;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .login-link a {
+        color: #446178;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    /* Style for form fields that are using Django's as_table */
+    .form-table {
+        width: 100%;
+    }
+
+    .form-table td {
+        padding: 8px 0;
+    }
+
+    .form-table tr td:first-child {
+        width: 25%;
+        vertical-align: top;
+        padding-top: 15px;
+        padding-right: 20px;
+        white-space: nowrap;
+    }
+
+    .form-table tr td:last-child {
+        width: 75%;
+    }
+
+    .form-table input, .form-table select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+
+    .form-table ul.errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0 0;
+        color: #dc3545;
+        font-size: 14px;
+    }
+</style>
 {% endblock meta %}
 
 {% block content %}
+<div class="register-container">
+    <div class="register-box">
+        <h1>Create Account</h1>
+        <p>Please fill in the details to register</p>
 
-<div>
-  <h1>Register</h1>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-  <form method="POST">
-    {% csrf_token %}
-    <table>
-      {{ form.as_table }}
-      <tr>
-        <td></td>
-        <td><input type="submit" name="submit" value="Daftar" /></td>
-      </tr>
-    </table>
-  </form>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <table class="form-table">
+                {{ form.as_table }}
+                <tr>
+                    <td></td>
+                    <td><button type="submit" class="register-btn">Register</button></td>
+                </tr>
+            </table>
+        </form>
 
-  {% if messages %}
-  <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+        <div class="login-link">
+            Already have an account? <a href="{% url 'users:login' %}">Login Here</a>
+        </div>
+    </div>
 </div>
-
 {% endblock content %}

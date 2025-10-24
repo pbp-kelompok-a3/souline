@@ -1,24 +1,96 @@
 {% extends "base.html" %}
 
 {% block meta %}
-<title>Add New Studio - Souline</title>
+<title>Add New Studio | Souline</title>
 {% endblock meta %}
 
 {% block content %}
-<h1>Add New Studio</h1>
-<p>Fill in the form below to add a new yoga/pilates studio.</p>
+{% include "header.html" %}
 
-<form method="POST">
-    {% csrf_token %}
-    
-    <table>
-        {{ form.as_table }}
-        <tr>
-            <td></td>
-            <td>
-                <input type="submit" value="Add Studio">
-            </td>
-        </tr>
-    </table>
-</form>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-[#446178] mb-2">Add New Studio</h1>
+    <p class="text-lg text-gray-600">Fill in the form below to add a new yoga/pilates studio to the database</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-2xl shadow-lg p-8">
+    <form method="POST" class="space-y-6">
+      {% csrf_token %}
+      
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-[#446178] mb-2">
+            {{ field.label }}
+            {% if field.field.required %}
+              <span class="text-red-500">*</span>
+            {% endif %}
+          </label>
+          
+          {% if field.field.widget.input_type == 'textarea' %}
+            <textarea 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#91C4C3] focus:outline-none transition-colors duration-300 resize-vertical"
+              rows="4"
+              {% if field.field.required %}required{% endif %}
+            >{{ field.value|default:'' }}</textarea>
+          {% elif field.field.widget.input_type == 'select' %}
+            <select 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#91C4C3] focus:outline-none transition-colors duration-300"
+              {% if field.field.required %}required{% endif %}
+            >
+              <option value="">---------</option>
+              {% for value, label in field.field.choices %}
+                {% if value %}
+                  <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ label }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          {% else %}
+            <input 
+              type="{{ field.field.widget.input_type }}" 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              value="{{ field.value|default:'' }}"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#91C4C3] focus:outline-none transition-colors duration-300"
+              {% if field.field.required %}required{% endif %}
+            />
+          {% endif %}
+          
+          {% if field.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+          {% endif %}
+          
+          {% if field.errors %}
+            <div class="mt-2">
+              {% for error in field.errors %}
+                <p class="text-sm text-red-500">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <!-- Form Actions -->
+      <div class="flex gap-4 pt-4">
+        <button 
+          type="submit" 
+          class="flex-1 px-6 py-3 bg-[#FFA04D] text-white rounded-lg font-semibold hover:bg-[#ff8c2e] hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+          Add Studio
+        </button>
+        <a 
+          href="{% url 'studio:show_studio' %}" 
+          class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 hover:shadow-md transition-all duration-300 text-center">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% include "footer.html" %}
 {% endblock content %}

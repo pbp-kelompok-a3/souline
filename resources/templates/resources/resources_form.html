@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include "header.html" %}
+<div class="min-h-screen bg-[#FFFBF0] flex items-center justify-center py-12">
+  <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-darkblue mb-6 text-center">Tambah Video Baru</h2>
+
+    <form id="addForm" class="space-y-4">
+      <div>
+        <label for="title" class="block text-darkblue font-medium mb-1">Judul Video</label>
+        <input 
+          type="text" 
+          id="title" 
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400" 
+          placeholder="Masukkan judul video" 
+          required
+        >
+      </div>
+
+      <div>
+        <label for="youtube_url" class="block text-darkblue font-medium mb-1">Link YouTube (embed)</label>
+        <input 
+          type="text" 
+          id="youtube_url" 
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400" 
+          placeholder="Contoh: https://www.youtube.com/embed/abc123"
+          required
+        >
+      </div>
+
+      <div>
+        <label for="description" class="block text-darkblue font-medium mb-1">Deskripsi Singkat</label>
+        <textarea 
+          id="description" 
+          rows="3" 
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400" 
+          placeholder="Tuliskan deskripsi singkat..."
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="level" class="block text-darkblue font-medium mb-1">Tingkat Kesulitan</label>
+        <select 
+          id="level" 
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+        >
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg shadow-md transition-all duration-200"
+      >
+        Tambah Video
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById('addForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+      title: document.getElementById('title').value,
+      youtube_url: document.getElementById('youtube_url').value,
+      description: document.getElementById('description').value,
+      level: document.getElementById('level').value,
+    };
+
+    const response = await fetch('/resources/api/add/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      alert('✅ Video berhasil ditambahkan!');
+      window.location.href = '/resources/';
+    } else {
+      alert('❌ Terjadi kesalahan saat menambahkan video.');
+    }
+  });
+</script>
+{% include 'footer.html' %}
+{% endblock %}
