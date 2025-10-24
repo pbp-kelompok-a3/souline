@@ -3,9 +3,6 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from users.models import UserProfile
 
-from studio.models import Studio # punya faza
-admin.site.register(Studio)
-
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False

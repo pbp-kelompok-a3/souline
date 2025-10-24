@@ -217,6 +217,27 @@
 </div>
 
 <script>
+  // Smooth scroll to section
+  document.addEventListener('DOMContentLoaded', function() {
+    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
+    
+    smoothScrollLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  });
+
   function scrollCarousel(carouselId, direction) {
     const carousel = document.querySelector(`[data-carousel="${carouselId}"]`);
     const wrapper = carousel.querySelector('.cards-wrapper');
