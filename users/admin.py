@@ -18,7 +18,7 @@ class UserAdmin(BaseUserAdmin):
         UserProfile.objects.get_or_create(
             user=obj,
             defaults={'kota': 'Jakarta'}  # SUPERUSER BARU otomatis Jakarta
-        ) # mari kita tanya kak danniel apa diperbolehkan
+        )
 # KALAU DIHAPUS SUPERUSER GA ADA KOTA
 # Re-register UserAdmin
 admin.site.unregister(User)
