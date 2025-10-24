@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'events',
+    'resources',
     'studio',
     'users',
     'sportswear',

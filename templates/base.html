@@ -14,20 +14,33 @@
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              poppins: ["Poppins", "sans-serif"],
+            },
             colors: {
               'body-bg': '#FFFBF0',        // Latar belakang utama (Light Beige)
               'card-bg': '#FFF7DD',        // Latar belakang card (Beige)
               'dark-blue': '#446178',      // Judul ("Sportswear")
               'highlight-orange': '#FFA04D', // Subjudul ("Stay Active. Stay Stylish.")
-            }
-          }
-        }
-      }
+              darkblue : "#446178",
+              lightblue : "#8BC4DA",
+              lightbeige: "#FFFBF0",
+              beige: "#FFF7DD",
+              orange: "#FFA04D",
+              lightgreen: "#B4DEBD",
+
+
+            },
+            fontSize: {
+              64: "64px",
+              32: "32px",
+            },
+          },
+        },
+      };
     </script>
   </head>
-    <body class="bg-body-bg">
-    
-        {% block content %} {% endblock content %}
-
-      </body>
+  <body>
+    {% block content %} {% endblock content %}
+  </body>
 </html>
