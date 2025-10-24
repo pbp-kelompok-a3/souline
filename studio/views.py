@@ -31,6 +31,20 @@ def add_studio(request):
 
 @login_required(login_url='/users/login/')
 @user_passes_test(is_admin, login_url='/users/login/')
+def edit_studio(request, id):
+    studio = get_object_or_404(Studio, id=id)
+    form = StudioForm(request.POST or None, instance=studio)
+    
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, f'Studio "{studio.nama_studio}" has been updated successfully!')
+        return redirect('studio:show_studio')
+    
+    context = {'form': form, 'studio': studio}
+    return render(request, 'studio/edit_studio.html', context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(is_admin, login_url='/users/login/')
 def delete_studio(request, id):
     studio = get_object_or_404(Studio, id=id)
     studio_name = studio.nama_studio
