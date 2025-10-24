@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<title>Profile</title>
+{% endblock meta %}
+
+{% block content %}
+
+<div class="navigation">
+    <p><a href="{% url 'main:main' %}">← Back to Main</a></p>
+</div>
+
+<h1>Your Profile</h1>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<div class="profile">
+    <h2>Account</h2>
+    
+    <h3>Change Username</h3>
+    <form method="POST" action="{% url 'users:change_username' %}">
+        {% csrf_token %}
+        <p>
+            <label for="new_username">New Username:</label>
+            <input type="text" name="new_username" id="new_username" required>
+        </p>
+        <p><input type="submit" value="Change Username" /></p>
+    </form>
+
+    <h3>Change Password</h3>
+    <form method="POST" action="{% url 'users:change_password' %}">
+        {% csrf_token %}
+        <p>
+            <label for="old_password">Current Password:</label>
+            <input type="password" name="old_password" id="old_password" required>
+        </p>
+        <p>
+            <label for="new_password1">New Password:</label>
+            <input type="password" name="new_password1" id="new_password1" required>
+        </p>
+        <p>
+            <label for="new_password2">Confirm New Password:</label>
+            <input type="password" name="new_password2" id="new_password2" required>
+        </p>
+        <p><input type="submit" value="Change Password" /></p>
+    </form>
+
+    <h3>Update Kota</h3>
+    <form method="POST" action="{% url 'users:profile' %}">
+        {% csrf_token %}
+        {{ form.as_table }}
+        <p><input type="submit" value="Save" /></p>
+    </form>
+
+    <h3>Danger Zone</h3>
+    <p>Deleting your account is permanent.</p>
+    <form method="POST" action="{% url 'users:delete_account' %}" onsubmit="return confirm('Are you sure you want to delete your account?');">
+        {% csrf_token %}
+        <input type="submit" value="Delete my account" />
+    </form>
+
+    <p><a href="{% url 'users:logout' %}">Logout</a></p>
+</div>
+
+{% endblock content %}

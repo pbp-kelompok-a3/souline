@@ -1,11 +1,32 @@
-from django.shortcuts import render, redirect
+from datetime import date, timedelta, timezone
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Event
 from .forms import EventForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.core import serializers
+
+from users.models import UserProfile
 
 def show_events(request):
-    events = Event.objects.all().order_by('date')
-    return render(request, 'events/show_events.html', {'events': events})
+    filter_type = request.GET.get('filter')  # 'soon' or 'later'
+    today = date.today()
+    soon_limit = today + timedelta(days=7)
 
+    if filter_type == 'soon':
+        events = Event.objects.filter(date__gte=today, date__lte=soon_limit)
+    elif filter_type == 'later':
+        events = Event.objects.filter(date__gt=soon_limit)
+    else:
+        events = Event.objects.filter(date__gte=today)
+
+    return render(request, 'events/show_events.html', {
+        'events': events,
+        'filter_type': filter_type,
+    })
+
+@login_required(login_url='/login/')
 def add_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
@@ -15,3 +36,32 @@ def add_event(request):
     else:
         form = EventForm()
     return render(request, 'events/add_event.html', {'form': form})
+
+def show_json(request):
+    events = Event.objects.all().order_by('date')
+    data = [{
+        "id": e.id,
+        "name": e.name,
+        "date": e.date.strftime("%d %B %Y"),
+        "description": e.description,
+        "poster": e.poster.url if e.poster else "",
+    } for e in events]
+    return JsonResponse(data, safe=False)
+
+def show_json_filtered(request, filter_type):
+    today = timezone.now().date()
+    if filter_type == "soon":
+        events = Event.objects.filter(date__gte=today, date__lte=today + timedelta(days=7))
+    elif filter_type == "later":
+        events = Event.objects.filter(date__gt=today + timedelta(days=7))
+    else:
+        events = Event.objects.all()
+
+    data = [{
+        "id": e.id,
+        "name": e.name,
+        "date": e.date.strftime("%d %B %Y"),
+        "description": e.description,
+        "poster": e.poster.url if e.poster else "",
+    } for e in events]
+    return JsonResponse(data, safe=False)

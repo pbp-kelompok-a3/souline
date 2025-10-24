@@ -1,64 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
+{% include "header.html" %}
 
-<!-- Background & container -->
-<div class="bg-[#FFF9F1] min-h-screen py-12 flex flex-col items-center">
+<div class="min-h-screen bg-[#FFF9F1] flex flex-col items-center py-16 px-6 font-poppins">
 
   <!-- Header -->
-  <div class="text-center mb-12">
+  <div class="text-center mb-10">
     <h1 class="text-4xl font-bold text-[#2E4057]">Events</h1>
     <p class="text-[#F48C06] mt-2 text-lg">Take a moment to feel your flow</p>
   </div>
 
-  <!-- Content wrapper -->
-  <div class="flex justify-center items-center space-x-8 w-full max-w-6xl px-6">
-    <!-- Left placeholder  -->
-    <div class="bg-[#FFF1DA] w-1/5 h-80 rounded-3xl"></div>
+  <!-- Filter dropdown -->
+  <div class="mb-8">
+    <select id="filter-select"
+      class="border border-[#F48C06]/30 bg-white rounded-full px-6 py-2 text-gray-700 focus:ring-2 focus:ring-[#F48C06] focus:outline-none shadow-sm">
+      <option value="">All Upcoming Events</option>
+      <option value="soon">Upcoming Soon (within 7 days)</option>
+      <option value="later">Coming Later (after 7 days)</option>
+    </select>
+  </div>
 
-    <!-- Main Event Card -->
-    <div class="bg-white shadow-md rounded-3xl p-6 w-3/5 flex flex-col md:flex-row items-center text-left">
-      {% if events %}
-        {% for event in events %}
-          <div class="flex flex-col md:flex-row items-center">
-            {% if event.poster %}
-              <img src="{{ event.poster.url }}" alt="{{ event.name }}" 
-                   class="rounded-2xl w-56 h-56 object-cover shadow-md mb-4 md:mb-0 md:mr-6">
-            {% else %}
-              <div class="w-56 h-56 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 mb-4 md:mb-0 md:mr-6">
-                No Image
-              </div>
-            {% endif %}
-            <div>
-              <h2 class="font-semibold text-xl text-[#2E4057]">{{ event.name }}</h2>
-              <p class="text-sm text-gray-500 mb-2">{{ event.date|date:"d F Y" }}</p>
-              <p class="text-gray-600 text-justify">{{ event.description }}</p>
-              {% if event.registration_link %}
-                <a href="{{ event.registration_link }}" target="_blank"
-                   class="inline-block mt-3 text-[#F48C06] hover:underline">
-                   Learn more →
-                </a>
-              {% endif %}
+  <!-- Events container -->
+  <div id="events-container" class="flex flex-wrap justify-center gap-8 max-w-6xl">
+    {% if events %}
+      {% for event in events %}
+        <div class="bg-[#FFF5E9] border border-[#F48C06]/10 shadow-lg rounded-3xl w-80 p-6 flex flex-col items-center hover:shadow-xl transition-all">
+          {% if event.poster %}
+            <img src="{{ event.poster.url }}" alt="{{ event.name }}"
+                 class="rounded-2xl w-64 h-48 object-cover shadow-md mb-4">
+          {% else %}
+            <div class="w-64 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 mb-4">
+              No Image
             </div>
-          </div>
-        {% empty %}
-          <p class="text-gray-500 italic text-center w-full">No upcoming events yet.</p>
-        {% endfor %}
-      {% else %}
-        <p class="text-gray-500 italic text-center w-full">No upcoming events yet.</p>
-      {% endif %}
-    </div>
-
-    <!-- Right placeholder -->
-    <div class="bg-[#FFF1DA] w-1/5 h-80 rounded-3xl"></div>
+          {% endif %}
+          <h2 class="font-semibold text-xl text-[#2E4057] text-center">{{ event.name }}</h2>
+          <p class="text-sm text-gray-500 mt-1">{{ event.date|date:"d F Y" }}</p>
+          <p class="text-gray-600 text-justify mt-3 text-sm">{{ event.description|truncatechars:100 }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-500 italic text-center w-full">No upcoming events yet.</p>
+    {% endif %}
   </div>
 
   <!-- Add Event Button -->
   <div class="flex justify-center mt-12">
-    <a href="{% url 'add_event' %}" 
-       class="bg-[#F48C06] text-white px-6 py-2 rounded-full hover:bg-[#ff9e1c] transition">
+    <a href="{% url 'add_event' %}"
+       class="bg-[#F48C06] text-white px-6 py-2 rounded-full hover:bg-[#e07b00] transition shadow-md">
        + Add Event
     </a>
   </div>
 </div>
 
+<!-- AJAX -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const select = document.getElementById('filter-select');
+  const container = document.getElementById('events-container');
+
+  select.addEventListener('change', function() {
+    const filterType = this.value;
+    fetch(`/events/json/${filterType || ''}`)
+      .then(response => response.json())
+      .then(data => {
+        container.innerHTML = '';
+
+        if (data.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 italic text-center w-full">No upcoming events found.</p>';
+          return;
+        }
+
+        data.forEach(event => {
+          const card = `
+            <div class="bg-[#FFF5E9] border border-[#F48C06]/10 shadow-lg rounded-3xl w-80 p-6 flex flex-col items-center hover:shadow-xl transition-all">
+              ${event.poster ? `<img src="${event.poster}" class="rounded-2xl w-64 h-48 object-cover shadow-md mb-4">`
+                              : `<div class="w-64 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 mb-4">No Image</div>`}
+              <h2 class="font-semibold text-xl text-[#2E4057] text-center">${event.name}</h2>
+              <p class="text-sm text-gray-500 mt-1">${event.date}</p>
+              <p class="text-gray-600 text-justify mt-3 text-sm">${event.description}</p>
+            </div>`;
+          container.insertAdjacentHTML('beforeend', card);
+        });
+      });
+  });
+});
+</script>
 {% endblock %}
