@@ -109,9 +109,13 @@
         Resources
       </h2>
       <p class="text-lg text-[#FFA04D] mt-1">
-        Description Placeholder
+        A guide to discovering your strength.
       </p>
     </div>
+    <a href="{% url 'resources:resource_list' %}" 
+       class="px-6 py-2.5 bg-[#B4DEBD] text-[#446178] rounded-full font-medium hover:bg-[#91C4C3] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
+      View All Resources
+    </a>
   </div>
 
     <!-- Content Placeholder (lanjut disini untuk Resources di halaman main) -->
@@ -130,7 +134,14 @@
         Share your journey with the community
       </p>
     </div>
+    <a href="{% url 'timeline:list' %}" 
+       class="px-6 py-2.5 bg-[#B4DEBD] text-[#446178] rounded-full font-medium hover:bg-[#91C4C3] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
+      View All Timelines
+    </a>
   </div>
+
+  <!-- Content Placeholder (lanjut disini untuk Timeline di halaman main) -->
+
 </div>
   
 
@@ -146,7 +157,14 @@
         Take a moment to feel your flow
       </p>
     </div>
+    <a href="{% url 'events:event_list' %}" 
+       class="px-6 py-2.5 bg-[#B4DEBD] text-[#446178] rounded-full font-medium hover:bg-[#91C4C3] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
+      View All Events
+    </a>
   </div>
+
+  <!-- Content Placeholder (lanjut disini untuk Events di halaman main) -->
+
 </div>
 
 <!-- Sportswear Section -->
@@ -161,6 +179,10 @@
         Stay Active, Stay Stylish
       </p>
     </div>
+    <a href="{% url 'sportswear:show_sportswear' %}" 
+       class="px-6 py-2.5 bg-[#B4DEBD] text-[#446178] rounded-full font-medium hover:bg-[#91C4C3] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
+      View All Sportswear
+    </a>
   </div>
 
     <!-- Content Placeholder (lanjut disini untuk Sportswear di halaman main) -->
