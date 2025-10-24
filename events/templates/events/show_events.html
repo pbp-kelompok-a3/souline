@@ -57,7 +57,7 @@
   <!-- Add Event Button (admin only) -->
   {% if request.user.is_staff %}
   <div class="flex justify-start w-full max-w-6xl mt-14">
-    <a href="{% url 'add_event' %}" class="add-btn shadow-md">
+    <a href="{% url 'events:add_event' %}" class="add-btn shadow-md">
        + Add Event
     </a>
   </div>
