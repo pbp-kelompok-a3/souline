@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% block title %}Events | Souline{% endblock title %}
+
 {% block content %}
 {% include "header.html" %}
 
@@ -85,4 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
+{% include "footer.html" %}
 {% endblock %}
