@@ -12,7 +12,7 @@
         <a href="{% url 'studio:show_studio' %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
           Studio
         </a>
-        <a href="{% url "resources:resource_page" %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
+        <a href="{% url 'resources:resource_list' %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
           Resources
         </a>
         
@@ -88,7 +88,7 @@
          class="block px-3 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
         Studio
       </a>
-      <a href="#" 
+      <a href="{% url 'resources:resource_list' %}" 
          class="block px-3 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
         Resources
       </a>
