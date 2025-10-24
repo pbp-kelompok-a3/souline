@@ -1,8 +1,12 @@
-{% include 'navbar.html' %}
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'header.html' %}
 
 <div class="min-h-screen bg-[#FFFBF0] flex flex-col items-center px-6 py-10">
   <!-- Judul -->
-  <h1 class="text-3xl font-bold text-darkblue mb-6 text-center">
+  <h1 class="text-3xl font-bold text-[#446178] mb-4 text-center"
+      style="font-family: 'Poppins', sans-serif; font-size: 32px;">
     {{ resource.title }}
   </h1>
 
@@ -10,29 +14,34 @@
   <div class="w-full max-w-4xl aspect-video mb-8 rounded-xl overflow-hidden shadow-lg">
     <iframe
       class="w-full h-full"
-      src="https://www.youtube.com/embed/{{ resource.youtube_url|cut:'https://www.youtube.com/watch?v=' }}"
+      src="https://www.youtube.com/embed/{% if 'v=' in resource.youtube_url %}{{ resource.youtube_url|cut:'https://www.youtube.com/watch?v=' }}{% elif 'youtu.be/' in resource.youtube_url %}{{ resource.youtube_url|cut:'https://youtu.be/' }}{% elif 'embed/' in resource.youtube_url %}{{ resource.youtube_url|cut:'https://www.youtube.com/embed/' }}{% endif %}"
       frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen>
     </iframe>
   </div>
 
+  <!-- Badge (rata kanan) -->
+  <div class="w-full max-w-3xl flex justify-start mb-4">
+    {% if resource.level|lower == "beginner" %}
+      <span class="bg-green-100 text-green-700 text-sm font-semibold px-4 py-2 rounded-full shadow">
+        Beginner
+      </span>
+    {% elif resource.level|lower == "intermediate" %}
+      <span class="bg-yellow-100 text-yellow-700 text-sm font-semibold px-4 py-2 rounded-full shadow">
+        Intermediate
+      </span>
+    {% elif resource.level|lower == "advanced" %}
+      <span class="bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-2 rounded-full shadow">
+        Advanced
+      </span>
+    {% endif %}
+  </div>
+
   <!-- Deskripsi -->
-  <p class="text-gray-700 text-lg max-w-3xl text-center mb-6 leading-relaxed">
+  <p class="text-gray-700 text-lg max-w-3xl text-lg leading-relaxed"
+     style="font-family: 'Poppins', sans-serif; text-align: justify;">
     {{ resource.description }}
   </p>
-
-  <!-- Badge tingkat kesulitan -->
-  {% if resource.level == "Beginner" %}
-    <span class="bg-green-100 text-green-700 text-sm font-semibold px-4 py-2 rounded-full shadow">
-      Beginner
-    </span>
-  {% elif resource.level == "Intermediate" %}
-    <span class="bg-yellow-100 text-yellow-700 text-sm font-semibold px-4 py-2 rounded-full shadow">
-      Intermediate
-    </span>
-  {% elif resource.level == "Advanced" %}
-    <span class="bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-2 rounded-full shadow">
-      Advanced
-    </span>
-  {% endif %}
 </div>
+{% endblock %}

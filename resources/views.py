@@ -5,7 +5,7 @@ from .models import Resource
 from django.views.decorators.csrf import csrf_exempt
 
 # 🔹 HALAMAN UTAMA (menampilkan template list video)
-def resource_page(request):
+def resource_list_page(request):
     return render(request, 'resources/resources_list.html')
 
 def resource_form_page(request):
@@ -18,8 +18,8 @@ def resource_detail_page(request, pk):
     resource = get_object_or_404(Resource, pk=pk)
     return render(request, 'resources/resources_detail.html', {'resource': resource})
 
-# 🔹 API - READ
-def resource_list(request):
+#  API - READ
+def resource_list_api(request):
     resources = Resource.objects.all().order_by('-created_at')
     data = []
 
@@ -45,7 +45,7 @@ def resource_list(request):
     return JsonResponse(data, safe=False)  
 
 
-# 🔹 API - CREATE
+#  API - CREATE
 @csrf_exempt
 def add_resource(request):
     if request.method == 'POST':
@@ -59,7 +59,7 @@ def add_resource(request):
         return JsonResponse({"status": "success", "id": resource.id})
     return JsonResponse({"status": "error"}, status=400)
 
-# 🔹 API - UPDATE
+#  API - UPDATE
 @csrf_exempt
 def edit_resource(request, pk):
     resource = get_object_or_404(Resource, pk=pk)
@@ -73,7 +73,7 @@ def edit_resource(request, pk):
         return JsonResponse({"status": "updated"})
     return JsonResponse({"status": "error"}, status=400)
 
-# 🔹 API - DELETE
+#  API - DELETE
 @csrf_exempt
 def delete_resource(request, pk):
     resource = get_object_or_404(Resource, pk=pk)
