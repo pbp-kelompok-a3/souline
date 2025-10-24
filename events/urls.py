@@ -7,4 +7,6 @@ urlpatterns = [
     path('add/', views.add_event, name='add_event'),
     path('json/', views.show_json, name='show_json'),
     path('json/<str:filter_type>/', views.show_json_filtered, name='show_json_filtered'),
+    path('edit/<int:id>/', views.edit_event, name='edit_event'),
+    path('delete/<int:id>/', views.delete_event, name='delete_event'),
 ]
