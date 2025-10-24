@@ -17,8 +17,8 @@ def show_studio(request):
 def is_admin(user):
     return user.is_superuser or user.is_staff
 
-@login_required(login_url='/login/')
-@user_passes_test(is_admin, login_url='/login/')
+@login_required(login_url='/users/login/')
+@user_passes_test(is_admin, login_url='/users/login/')
 def add_studio(request):
     form = StudioForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -29,8 +29,8 @@ def add_studio(request):
     context = {'form': form}
     return render(request, 'studio/add_studio.html', context)
 
-@login_required(login_url='/login/')
-@user_passes_test(is_admin, login_url='/login/')
+@login_required(login_url='/users/login/')
+@user_passes_test(is_admin, login_url='/users/login/')
 def delete_studio(request, id):
     studio = get_object_or_404(Studio, id=id)
     studio_name = studio.nama_studio
