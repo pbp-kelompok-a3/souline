@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'header.html' %}
+<div class="min-h-screen bg-[#FFFBF0] flex justify-center items-center py-10">
+  <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-darkblue mb-6 text-center">Edit Video</h2>
+
+    <form id="editForm" class="space-y-4">
+      <input type="hidden" id="resource-id" value="{{ resource_id }}">
+
+      <div>
+        <label class="block text-darkblue font-medium mb-1">Judul</label>
+        <input id="title" type="text" class="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-amber-500 focus:border-amber-500" required>
+      </div>
+
+      <div>
+        <label class="block text-darkblue font-medium mb-1">Deskripsi</label>
+        <textarea id="description" rows="3" class="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-amber-500 focus:border-amber-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-darkblue font-medium mb-1">YouTube URL</label>
+        <input id="youtube_url" type="text" class="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-amber-500 focus:border-amber-500" required>
+      </div>
+
+      <div>
+        <label class="block text-darkblue font-medium mb-1">Level</label>
+        <select id="level" class="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg shadow-md">Simpan Perubahan</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const resourceId = "{{ resource_id }}";
+
+  // Ambil data video
+  async function loadResource() {
+    const response = await fetch('/resources/api/');
+    const resources = await response.json();
+    const resource = resources.find(r => r.id == resourceId);
+
+    if (resource) {
+      document.getElementById("title").value = resource.title;
+      document.getElementById("description").value = resource.description;
+      document.getElementById("youtube_url").value = resource.youtube_url;
+      document.getElementById("level").value = resource.level;
+    }
+  }
+
+  document.getElementById("editForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const updatedData = {
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      youtube_url: document.getElementById("youtube_url").value,
+      level: document.getElementById("level").value
+    };
+
+    const response = await fetch(`/resources/api/edit/${resourceId}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedData)
+    });
+
+    const result = await response.json();
+    if (result.status === "updated") {
+      alert("Perubahan berhasil disimpan!");
+      window.location.href = "/resources/";
+    } else {
+      alert("Terjadi kesalahan saat menyimpan perubahan.");
+    }
+  });
+
+  loadResource();
+</script>
+{% endblock %}

@@ -12,7 +12,7 @@
         <a href="{% url 'studio:show_studio' %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
           Studio
         </a>
-        <a href="#" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
+        <a href="{% url "resources:resource_page" %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
           Resources
         </a>
         
@@ -28,7 +28,7 @@
           <!-- Dropdown Menu -->
           <div id="more-menu" class="hidden absolute top-full left-0 pt-2 w-48">
             <div class="bg-[#FFF7DD]/85 backdrop-blur-md rounded-lg shadow-xl border border-[#446178]/10 py-2">
-              <a href="#" class="block px-4 py-2 text-[#446178] hover:bg-[#446178]/10 hover:text-[#91C4C3] transition-all duration-300 font-medium">
+              <a href="{% url 'timeline:list' %}" class="block px-4 py-2 text-[#446178] hover:bg-[#446178]/10 hover:text-[#91C4C3] transition-all duration-300 font-medium">
                 Timeline
               </a>
               <a href="{% url 'event_list' %}" class="block px-4 py-2 text-[#446178] hover:bg-[#446178]/10 hover:text-[#91C4C3] transition-all duration-300 font-medium">

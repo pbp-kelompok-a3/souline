@@ -132,8 +132,52 @@
     </div>
   </div>
 
-    <!-- Content Placeholder (lanjut disini untuk Timeline di halaman main) -->
-    
+  <!-- Timeline Content -->
+  <div class="max-w-3xl mx-auto w-full">
+    {% if user.is_authenticated %}
+      <form id="postForm" method="post" enctype="multipart/form-data"
+            action="{% url 'timeline:create' %}"
+            class="bg-card-bg p-5 rounded-2xl shadow-md space-y-3">
+        {% csrf_token %}
+        {{ post_form.text }}
+        <div class="flex flex-col sm:flex-row gap-3">
+          {{ post_form.image }}
+          {{ post_form.video_url }}
+        </div>
+        <button type="submit"
+                class="bg-highlight-orange text-white font-semibold px-5 py-2 rounded-lg hover:bg-[#ff8c2e] transition">
+          Post
+        </button>
+        <div id="postErrors" class="text-red-600 text-sm mt-2 hidden"></div>
+      </form>
+    {% else %}
+      <p class="text-center text-dark-blue">
+        Please <a href="{% url 'users:login' %}" class="text-highlight-orange underline">log in</a> to post.
+      </p>
+    {% endif %}
+
+    <!-- Timeline Feed -->
+    <section id="posts" class="mt-8 space-y-6">
+      {% for post in posts %}
+        {% include "timeline/_post.html" %}
+      {% empty %}
+        <p class="text-center text-dark-blue">No posts yet. Be the first!</p>
+      {% endfor %}
+    </section>
+
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8 space-x-4 text-dark-blue font-medium">
+      {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}" class="hover:text-highlight-orange">← Prev</a>
+      {% endif %}
+      <span>Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}" class="hover:text-highlight-orange">Next →</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="{% static 'timeline/timeline.js' %}"></script>
 </div>
 
 <!-- Events Section -->
@@ -173,6 +217,27 @@
 </div>
 
 <script>
+  // Smooth scroll to section
+  document.addEventListener('DOMContentLoaded', function() {
+    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
+    
+    smoothScrollLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  });
+
   function scrollCarousel(carouselId, direction) {
     const carousel = document.querySelector(`[data-carousel="${carouselId}"]`);
     const wrapper = carousel.querySelector('.cards-wrapper');

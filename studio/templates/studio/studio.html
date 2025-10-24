@@ -8,18 +8,18 @@
 {% include "header.html" %}
 
 <!-- Main Content Container -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
   <!-- Page Header -->
-  <div class="mb-8">
-    <h1 class="text-4xl font-bold text-[#446178] mb-2">Discover Your Perfect Studio</h1>
-    <p class="text-lg text-[#FFA04D]">Find your space to move and breathe</p>
+  <div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#446178] mb-1 sm:mb-2">Discover Your Perfect Studio</h1>
+    <p class="text-base sm:text-lg text-[#FFA04D]">Find your space to move and breathe</p>
   </div>
 
   <!-- Admin Action Button (Only visible to staff/superuser) -->
   {% if user.is_staff or user.is_superuser %}
-    <div class="mb-6">
+    <div class="mb-4 sm:mb-6">
       <a href="{% url 'studio:add_studio' %}" 
-         class="inline-block px-6 py-3 bg-[#FFA04D] text-white rounded-lg hover:bg-[#ff8c2e] transition-all duration-300 font-medium shadow-md hover:shadow-lg">
+         class="inline-block w-full sm:w-auto text-center px-4 sm:px-6 py-2.5 sm:py-3 bg-[#FFA04D] text-white rounded-lg hover:bg-[#ff8c2e] transition-all duration-300 font-medium shadow-md hover:shadow-lg">
         + Add New Studio
       </a>
     </div>
@@ -28,42 +28,42 @@
   <!-- Studios Container (Will be populated by AJAX) -->
   <div id="studios-container">
     <!-- Loading State -->
-    <div id="loading-state" class="space-y-12">
-      <div class="mb-12">
-        <div class="mb-4">
-          <div class="h-9 bg-gray-200 rounded-lg w-64 animate-pulse"></div>
+    <div id="loading-state" class="space-y-8 sm:space-y-10 md:space-y-12">
+      <div class="mb-8 sm:mb-10 md:mb-12">
+        <div class="mb-3 sm:mb-4">
+          <div class="h-7 sm:h-8 md:h-9 bg-gray-200 rounded-lg w-48 sm:w-56 md:w-64 animate-pulse"></div>
         </div>
-        <div class="carousel-container relative py-4">
-          <div class="cards-wrapper flex gap-6 overflow-x-auto p-4">
+        <div class="carousel-container relative py-2 sm:py-4">
+          <div class="cards-wrapper flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto p-2 sm:p-4">
             <!-- Skeleton Cards -->
-            <div class="skeleton-card min-w-[320px] max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md flex-shrink-0">
-              <div class="w-full h-48 bg-gray-200 animate-pulse"></div>
-              <div class="p-5 space-y-3">
-                <div class="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
-                <div class="h-10 bg-gray-200 rounded-lg animate-pulse w-full mt-2"></div>
+            <div class="skeleton-card min-w-[280px] sm:min-w-[320px] max-w-[280px] sm:max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md flex-shrink-0">
+              <div class="w-full h-40 sm:h-48 bg-gray-200 animate-pulse"></div>
+              <div class="p-4 sm:p-5 space-y-3">
+                <div class="h-5 sm:h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                <div class="h-9 sm:h-10 bg-gray-200 rounded-lg animate-pulse w-full mt-2"></div>
               </div>
             </div>
-            <div class="skeleton-card min-w-[320px] max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md flex-shrink-0">
-              <div class="w-full h-48 bg-gray-200 animate-pulse"></div>
-              <div class="p-5 space-y-3">
-                <div class="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
-                <div class="h-10 bg-gray-200 rounded-lg animate-pulse w-full mt-2"></div>
+            <div class="skeleton-card min-w-[280px] sm:min-w-[320px] max-w-[280px] sm:max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md flex-shrink-0">
+              <div class="w-full h-40 sm:h-48 bg-gray-200 animate-pulse"></div>
+              <div class="p-4 sm:p-5 space-y-3">
+                <div class="h-5 sm:h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                <div class="h-9 sm:h-10 bg-gray-200 rounded-lg animate-pulse w-full mt-2"></div>
               </div>
             </div>
-            <div class="skeleton-card min-w-[320px] max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md flex-shrink-0">
-              <div class="w-full h-48 bg-gray-200 animate-pulse"></div>
-              <div class="p-5 space-y-3">
-                <div class="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
-                <div class="h-10 bg-gray-200 rounded-lg animate-pulse w-full mt-2"></div>
+            <div class="skeleton-card min-w-[280px] sm:min-w-[320px] max-w-[280px] sm:max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md flex-shrink-0">
+              <div class="w-full h-40 sm:h-48 bg-gray-200 animate-pulse"></div>
+              <div class="p-4 sm:p-5 space-y-3">
+                <div class="h-5 sm:h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                <div class="h-3 sm:h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                <div class="h-9 sm:h-10 bg-gray-200 rounded-lg animate-pulse w-full mt-2"></div>
               </div>
             </div>
           </div>
@@ -100,8 +100,12 @@
   function scrollCarousel(carouselId, direction) {
     const carousel = document.querySelector(`[data-carousel="${carouselId}"]`);
     const wrapper = carousel.querySelector('.cards-wrapper');
-    const cardWidth = 320 + 24; // Card width + gap
-    const scrollAmount = cardWidth * 2; // Scroll 2 cards at a time
+    
+    // Responsive card width calculation
+    const isMobile = window.innerWidth < 640;
+    const cardWidth = isMobile ? 280 : 320;
+    const gap = isMobile ? 12 : 24; // gap-3 (12px) on mobile, gap-6 (24px) on desktop
+    const scrollAmount = (cardWidth + gap) * (isMobile ? 1 : 2); // Scroll 1 card on mobile, 2 on desktop
     
     wrapper.scrollBy({
       left: direction * scrollAmount,
@@ -111,28 +115,51 @@
 
   // Initialize carousel buttons
   function initializeCarousels() {
-    const carousels = document.querySelectorAll('.carousel-container');
+    // Only select carousels in the content state (not loading state)
+    const contentState = document.getElementById('content-state');
+    const carousels = contentState.querySelectorAll('.carousel-container');
     
     carousels.forEach(carousel => {
       const wrapper = carousel.querySelector('.cards-wrapper');
-      const leftBtn = carousel.querySelector('button:first-of-type');
-      const rightBtn = carousel.querySelector('button:last-of-type');
+      const leftBtn = carousel.querySelector('button[aria-label="Scroll left"]');
+      const rightBtn = carousel.querySelector('button[aria-label="Scroll right"]');
       
-      if (!leftBtn || !rightBtn) return;
+      if (!leftBtn || !rightBtn || !wrapper) return;
       
       // Show/hide navigation buttons based on scroll position
       function updateButtons() {
-        const canScrollLeft = wrapper.scrollLeft > 10;
-        const canScrollRight = wrapper.scrollLeft < (wrapper.scrollWidth - wrapper.clientWidth - 10);
+        const scrollLeft = Math.round(wrapper.scrollLeft);
+        const scrollWidth = wrapper.scrollWidth;
+        const clientWidth = wrapper.clientWidth;
+        const maxScroll = scrollWidth - clientWidth;
+        const hasOverflow = scrollWidth > clientWidth + 20; // Account for padding
+        const canScrollLeft = scrollLeft > 30; // Show left arrow when scrolled right
+        const canScrollRight = hasOverflow && (scrollLeft < maxScroll - 20);
         
-        leftBtn.classList.toggle('hidden', !canScrollLeft);
-        rightBtn.classList.toggle('hidden', !canScrollRight);
+        // Update left button
+        if (canScrollLeft) {
+          leftBtn.classList.remove('hidden');
+        } else {
+          leftBtn.classList.add('hidden');
+        }
+        
+        // Update right button
+        if (canScrollRight) {
+          rightBtn.classList.remove('hidden');
+        } else {
+          rightBtn.classList.add('hidden');
+        }
       }
       
       // Update buttons on scroll and resize
-      updateButtons();
       wrapper.addEventListener('scroll', updateButtons);
       window.addEventListener('resize', updateButtons);
+      
+      // Call updateButtons immediately and with delays
+      updateButtons();
+      setTimeout(updateButtons, 100);
+      setTimeout(updateButtons, 300);
+      setTimeout(updateButtons, 600);
     });
   }
 
@@ -144,22 +171,22 @@
     
     // Delete button HTML (only for admins)
     const deleteButton = isAdmin ? `
-      <button onclick="deleteStudio('${studio.id}', '${studio.nama_studio}')" class="inline-block mt-2 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 hover:scale-105 hover:shadow-md transition-all duration-300">
+      <button onclick="deleteStudio('${studio.id}', '${studio.nama_studio}')" class="px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 hover:scale-105 hover:shadow-md transition-all duration-300 flex-shrink-0">
         🗑️
       </button>
     ` : '';
     
     return `
-      <div class="studio-card min-w-[320px] max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex-shrink-0 opacity-0 animate-fadeIn" data-studio-id="${studio.id}">
-        <img src="${thumbnail}" alt="${studio.nama_studio}" loading="lazy" class="w-full h-48 object-cover bg-gray-100" onerror="this.src='https://via.placeholder.com/320x192?text=No+Image'">
-        <div class="p-5">
-          <h3 class="text-xl font-semibold text-[#446178] mb-2 leading-tight">${studio.nama_studio}</h3>
-          <p class="text-[#91C4C3] font-medium text-sm mb-1">📍 ${studio.area}, ${studio.kota}</p>
-          <p class="text-gray-600 text-sm mb-1 leading-relaxed">📍 ${studio.alamat}</p>
-          <p class="text-gray-600 text-sm mb-3 leading-relaxed">📞 ${studio.nomor_telepon}</p>
-          <div class="flex gap-2">
+      <div class="studio-card min-w-[280px] sm:min-w-[320px] max-w-[280px] sm:max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex-shrink-0 opacity-0 animate-fadeIn" data-studio-id="${studio.id}">
+        <img src="${thumbnail}" alt="${studio.nama_studio}" loading="lazy" class="w-full h-40 sm:h-48 object-cover bg-gray-100" onerror="this.src='https://via.placeholder.com/320x192?text=No+Image'">
+        <div class="p-4 sm:p-5">
+          <h3 class="text-lg sm:text-xl font-semibold text-[#446178] mb-2 leading-tight line-clamp-2">${studio.nama_studio}</h3>
+          <p class="text-[#91C4C3] font-medium text-xs sm:text-sm mb-1 truncate">📍 ${studio.area}, ${studio.kota}</p>
+          <p class="text-gray-600 text-xs sm:text-sm mb-1 leading-relaxed line-clamp-2">📍 ${studio.alamat}</p>
+          <p class="text-gray-600 text-xs sm:text-sm mb-3 leading-relaxed">📞 ${studio.nomor_telepon}</p>
+          <div class="flex flex-wrap gap-2">
             <a href="${gmapsLink}" target="_blank" rel="noopener" 
-               class="inline-block mt-2 px-4 py-2 bg-[#FFA04D] text-white rounded-lg text-sm font-medium hover:bg-[#ff8c2e] hover:scale-105 hover:shadow-md transition-all duration-300">
+               class="flex-1 min-w-[160px] text-center px-3 sm:px-4 py-2 bg-[#FFA04D] text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-[#ff8c2e] hover:scale-105 hover:shadow-md transition-all duration-300">
               View on Google Maps →
             </a>
             ${deleteButton}
@@ -182,7 +209,7 @@
   function createCitySection(cityData) {
     const isUserCity = cityData.is_user_city;
     const cityLabel = isUserCity ? 
-      `<span class="mr-2">📍</span>${cityData.name} <span class="ml-2 text-sm font-normal text-[#91C4C3]">(Your City)</span>` :
+      `<span class="mr-1 sm:mr-2">📍</span>${cityData.name} <span class="ml-1 sm:ml-2 text-xs sm:text-sm font-normal text-[#91C4C3]">(Your City)</span>` :
       cityData.name;
     
     const carouselId = cityData.name.replace(/\s+/g, '-');
@@ -195,30 +222,30 @@
     }
     
     return `
-      <section class="mb-12 opacity-0 animate-fadeIn">
-        <div class="mb-4">
-          <h2 class="text-3xl font-semibold text-[#446178] flex items-center">
+      <section class="mb-8 sm:mb-10 md:mb-12 opacity-0 animate-fadeIn">
+        <div class="mb-3 sm:mb-4">
+          <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-[#446178] flex items-center flex-wrap">
             ${cityLabel}
           </h2>
         </div>
         
-        <div class="carousel-container relative py-4" data-carousel="${carouselId}">
-          <button class="hidden absolute top-1/2 left-2 -translate-y-1/2 w-10 h-10 bg-[#FFF7DD]/95 backdrop-blur-md border-2 border-[#446178] text-[#446178] rounded-full flex items-center justify-center cursor-pointer z-10 opacity-70 hover:bg-[#446178] hover:text-[#FFF7DD] hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg" 
+        <div class="carousel-container relative py-2 sm:py-4" data-carousel="${carouselId}">
+          <button class="hidden sm:flex absolute top-1/2 left-0 sm:left-2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFF7DD]/95 backdrop-blur-md border-2 border-[#446178] text-[#446178] rounded-full items-center justify-center cursor-pointer z-10 opacity-70 hover:bg-[#446178] hover:text-[#FFF7DD] hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg" 
                   onclick="scrollCarousel('${carouselId}', -1)" 
                   aria-label="Scroll left">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
           </button>
           
-          <div class="cards-wrapper flex gap-6 overflow-x-auto p-4">
+          <div class="cards-wrapper flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto p-2 sm:p-4">
             ${cardsHTML}
           </div>
           
-          <button class="hidden absolute top-1/2 right-2 -translate-y-1/2 w-10 h-10 bg-[#FFF7DD]/95 backdrop-blur-md border-2 border-[#446178] text-[#446178] rounded-full flex items-center justify-center cursor-pointer z-10 opacity-70 hover:bg-[#446178] hover:text-[#FFF7DD] hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg" 
+          <button class="hidden sm:flex absolute top-1/2 right-0 sm:right-2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFF7DD]/95 backdrop-blur-md border-2 border-[#446178] text-[#446178] rounded-full items-center justify-center cursor-pointer z-10 opacity-70 hover:bg-[#446178] hover:text-[#FFF7DD] hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg" 
                   onclick="scrollCarousel('${carouselId}', 1)" 
                   aria-label="Scroll right">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
           </button>
@@ -267,8 +294,8 @@
           });
         }, 10);
         
-        // Initialize carousel controls
-        setTimeout(initializeCarousels, 100);
+        // Initialize carousel controls after content is fully rendered
+        setTimeout(initializeCarousels, 300);
       } else {
         contentState.innerHTML = `
           <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
@@ -377,6 +404,59 @@
   
   .animate-fadeIn {
     animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .cards-wrapper {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  .cards-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Snap scrolling for cards */
+  .studio-card {
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+  
+  /* Mobile-specific optimizations */
+  @media (max-width: 640px) {
+    .studio-card {
+      scroll-snap-align: center;
+    }
+    
+    /* Prevent text selection during swipe */
+    .cards-wrapper {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+    }
+    
+    /* Improve touch target sizes */
+    .studio-card a,
+    .studio-card button {
+      min-height: 44px; /* Apple's recommended touch target size */
+    }
+  }
+  
+  /* Tablet optimizations */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .studio-card {
+      scroll-snap-align: start;
+    }
+  }
+  
+  /* Line clamp utility (for text truncation) */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 </style>
 

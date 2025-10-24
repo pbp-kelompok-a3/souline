@@ -6,7 +6,10 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from users.forms import CustomUserCreationForm
 from users.models import UserProfile
-
+from users.forms import UserProfileModelForm
+from django.views.decorators.http import require_POST
+from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 def register(request):
     if request.method == 'POST':
@@ -52,3 +55,66 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('users:login')
+
+
+@login_required(login_url='users:login')
+def profile(request):
+    user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        form = UserProfileModelForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('users:profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = UserProfileModelForm(instance=profile)
+
+    return render(request, 'profile.html', {'form': form})
+
+
+@login_required(login_url='users:login')
+@require_POST
+def change_username(request):
+    user = request.user
+    new_username = request.POST.get('new_username')
+    
+    if not new_username:
+        messages.error(request, 'Please provide a new username.')
+        return redirect('users:profile')
+        
+    if get_user_model().objects.filter(username=new_username).exclude(id=user.id).exists():
+        messages.error(request, 'This username is already taken.')
+        return redirect('users:profile')
+        
+    user.username = new_username
+    user.save()
+    messages.success(request, 'Username changed successfully.')
+    return redirect('users:profile')
+
+@login_required(login_url='users:login')
+@require_POST
+def change_password(request):
+    user = request.user
+    form = PasswordChangeForm(user, request.POST)
+    
+    if form.is_valid():
+        user = form.save()
+        update_session_auth_hash(request, user)
+        messages.success(request, 'Your password was successfully updated!')
+    else:
+        messages.error(request, 'Please correct the error below.')
+    
+    return redirect('users:profile')
+
+@login_required(login_url='users:login')
+@require_POST
+def delete_account(request):
+    user = request.user
+    logout(request)
+    user.delete()
+    messages.success(request, 'Your account has been deleted.')
+    return redirect('main:main')
