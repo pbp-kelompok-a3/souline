@@ -4,47 +4,75 @@
 {% block content %}
 {% include "header.html" %}
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h2 class="text-2xl font-bold mb-6 text-center">Events</h2>
+<div class="min-h-screen bg-[#FFF9F1] flex flex-col items-center py-16 px-6">
 
-    <!-- Filter buttons -->
-    <div class="flex justify-center space-x-4 mb-6">
-        <a href="?filter=soon" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Soon</a>
-        <a href="?filter=later" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Later</a>
-        <a href="." class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">All</a>
+  <!-- Header -->
+  <div class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+    <div>
+      <h1 class="text-4xl font-bold text-[#446178] mb-2">Events</h1>
+      <p class="text-[#F48C06] mt-2 text-lg font-medium">Take a moment to feel your flow</p>
     </div>
 
-    <!-- Grid of event cards -->
-    <div id="events-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for event in events %}
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
-            {% if event.poster %}
-            <img src="{{ event.poster.url }}" alt="{{ event.name }}" class="w-full h-48 object-cover">
-            {% endif %}
-            <div class="p-4 flex-1 flex flex-col">
-                <h3 class="text-xl font-semibold mb-2">{{ event.name }}</h3>
-                <p class="text-gray-500 text-sm mb-2">{{ event.date|date:"d M Y" }}</p>
-                <p class="text-gray-700 flex-1">{{ event.description|truncatechars:100 }}</p>
-                <div class="mt-4 flex space-x-2">
-                    <!-- Edit button -->
-                    <a href="{% url 'events:edit_event' event.id %}" class="flex-1 text-center bg-blue-500 text-white px-3 py-2 rounded-xl hover:bg-blue-600">Edit</a>
+    <!-- Filter dropdown -->
+    <div class="relative mt-6 md:mt-0">
+      <select id="filter-select"
+        class="appearance-none border border-[#F48C06]/30 bg-white rounded-full px-8 py-3 text-gray-400 text-left font-medium focus:ring-2 focus:ring-[#F48C06] focus:outline-none shadow-sm transition hover:shadow-md cursor-pointer">
+        <option value="">All Upcoming Events</option>
+        <option value="soon">Upcoming Soon (within 7 days)</option>
+        <option value="later">Coming Later (after 7 days)</option>
+      </select>
+      
+      <svg class="w-5 h-5 text-[#F48C06] absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
 
-                    <!-- Delete button -->
-                    <form action="{% url 'events:delete_event' event.id %}" method="POST" class="flex-1">
-                        {% csrf_token %}
-                        <button type="submit" class="w-full bg-red-500 text-white px-3 py-2 rounded-xl hover:bg-red-600">Delete</button>
-                    </form>
-                </div>
+  <!-- Events container -->
+  <div id="events-container" class="event-wrapper max-w-6xl justify-start md:justify-center">
+    {% if events %}
+      {% for event in events %}
+        <div class="event-card w-80 p-6 flex flex-col items-center text-center bg-white shadow-md rounded-2xl mb-8">
+          {% if event.poster %}
+            <img src="{{ event.poster.url }}" alt="{{ event.name }}" class="rounded-t-xl w-full h-48 object-cover mb-4">
+          {% else %}
+            <div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400 mb-4">
+              No image
             </div>
+          {% endif %}
+
+          <h2 class="font-semibold text-xl text-[#2E4057]">{{ event.name }}</h2>
+          <p class="event-date mt-1 text-gray-500">{{ event.date|date:"d F Y" }}</p>
+          <p class="text-gray-600 mt-3 text-sm text-center">{{ event.description|truncatechars:100 }}</p>
+
+          {% if user.is_staff %}
+          <div class="flex justify-center space-x-3 mt-4">
+            <a href="{% url 'events:edit_event' event.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600">Edit</a>
+            <a href="{% url 'events:delete_event' event.id %}" 
+               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" 
+               onclick="return confirm('Yakin mau hapus event ini?');">Delete</a>
+          </div>
+          {% endif %}
         </div>
-        {% empty %}
-        <p class="col-span-full text-center text-gray-500">No events found.</p>
-        {% endfor %}
-    </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-500 italic text-center w-full">No upcoming events yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Add Event Button (admin only) -->
+  {% if request.user.is_staff %}
+  <div class="flex justify-start w-full max-w-6xl mt-14">
+    <a href="{% url 'events:add_event' %}" class="add-btn shadow-md">
+       + Add Event
+    </a>
+  </div>
+  {% endif %}
 </div>
 
 <!-- AJAX -->
-{# 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const select = document.getElementById('filter-select');
@@ -77,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-#}
 
 {% include "footer.html" %}
 {% endblock %}
