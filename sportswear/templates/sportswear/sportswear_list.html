@@ -18,7 +18,7 @@
             <input type="text" id="search-input" 
                    class="w-full py-3 pl-5 pr-12 rounded-full border border-gray-300 shadow-sm 
                           focus:outline-none focus:ring-2 focus:ring-highlight-orange focus:border-highlight-orange" 
-                   placeholder="Cari brand atau deskripsi..." 
+                   placeholder="Search by brand or description..." 
                    onkeyup="filterBrands()">
             
             <span class="absolute right-0 top-0 h-full flex items-center pr-4 text-gray-500" style="z-index: 10;">
@@ -46,7 +46,7 @@
 
     function filterBrands() {
         const query = document.getElementById('search-input').value;
-        container.innerHTML = '<div class="col-span-2 text-center p-10"><p class="text-gray-500">Memuat...</p></div>';
+        container.innerHTML = '<div class="col-span-2 text-center p-10"><p class="text-gray-500">Loading...</p></div>';
 
         fetch(`/sportswear/filter_ajax/?q=${query}`, {
              method: 'GET',
@@ -59,12 +59,12 @@
         })
         .catch(error => {
             console.error('Error fetching data:', error);
-            container.innerHTML = '<div class="col-span-2 text-center p-10"><p class="text-red-500">❌ Gagal memuat data.</p></div>';
+            container.innerHTML = '<div class="col-span-2 text-center p-10"><p class="text-red-500">❌ Failed to load data.</p></div>';
         });
     }
 
     function deleteBrand(brandId) {
-        if (!confirm("Hapus Brand ini? Aksi ini permanen.")) return;
+        if (!confirm("Delete this brand? This action is permanent.")) return;
 
         fetch(`/sportswear/delete/${brandId}/`, {
             method: 'POST',
@@ -76,9 +76,9 @@
         .then(response => {
             if (response.ok) {
                 document.getElementById(`brand-card-${brandId}`).remove();
-                alert('Brand berhasil dihapus!');
+                alert('Brand successfully deleted!');
             } else {
-                alert('Gagal menghapus brand. Pastikan Anda Admin.');
+                alert('Failed to delete brand. Make sure you are an Admin.');
             }
         })
         .catch(error => console.error('Error deleting brand:', error));
