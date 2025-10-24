@@ -1,0 +1,74 @@
+<article id="post-{{ post.pk }}" class="bg-white rounded-xl shadow-md p-5 border border-[#446178]/10">
+  <div class="flex items-center justify-between mb-2">
+    <div class="text-dark-blue font-semibold">{{ post.author.username }}</div>
+    <div class="text-sm text-gray-500">{{ post.created_at|date:"M d, Y H:i" }}</div>
+  </div>
+
+  {% if post.text %}
+  <div class="post-body">
+    <p class="text-gray-800 mb-3 whitespace-pre-line">{{ post.text }}</p>
+  </div>
+  {% endif %}
+
+
+  {% if post.image %}
+    <img src="{{ post.image.url }}" alt="Post image" class="rounded-lg mb-3 max-h-96 w-full object-cover">
+  {% endif %}
+
+  {% if post.video_url %}
+    <a href="{{ post.video_url }}" target="_blank"
+       class="block text-highlight-orange hover:underline mb-3">Watch video</a>
+  {% endif %}
+
+  <div class="post-actions flex items-center justify-between mt-3 text-sm">
+  <div class="flex items-center gap-3">
+    <button class="like-btn flex items-center gap-1 text-dark-blue hover:text-highlight-orange"
+            data-post-id="{{ post.pk }}">
+      {% if user.is_authenticated and user in post.likes.all %}
+        ❤️
+      {% else %}
+        🤍
+      {% endif %}
+      <span class="like-count">{{ post.like_count }}</span>
+    </button>
+
+    {% if user == post.author %}
+      <button class="edit-btn text-[#446178] hover:text-[#FFA04D]" data-post-id="{{ post.pk }}">
+        ✏️ Edit
+      </button>
+      <button class="delete-btn text-red-500 hover:text-red-600" data-post-id="{{ post.pk }}">
+        🗑️ Delete
+      </button>
+    {% endif %}
+  </div>
+
+  <a href="{% url 'timeline:detail' post.pk %}" class="text-highlight-orange hover:underline">
+    Details
+  </a>
+</div>
+
+
+  <!-- Comments -->
+  <div class="mt-4 border-t border-gray-200 pt-3">
+    <div id="comments-for-{{ post.pk }}" class="space-y-2">
+      {% for comment in post.comments.all %}
+        {% include "_comment.html" %}
+      {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+      <form class="comment-form mt-2 flex gap-2" data-post-id="{{ post.pk }}"
+            action="{% url 'timeline:add_comment' post.pk %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="text"
+               placeholder="Write a comment..."
+               class="flex-grow border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-highlight-orange"
+               required>
+        <button type="submit"
+                class="bg-highlight-orange text-white rounded-lg px-4 py-1 hover:bg-[#ff8c2e] transition">
+          Send
+        </button>
+      </form>
+    {% endif %}
+  </div>
+</article>

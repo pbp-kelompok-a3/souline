@@ -36,6 +36,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "farrel-rifqi-souline.pbp.cs.ui.ac.id"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://farrel-rifqi-souline.pbp.cs.ui.ac.id"
+]
+
 
 # Application definition
 
@@ -48,9 +52,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'events',
+    'resources',
     'studio',
     'users',
     'sportswear',
+    'timeline',
 ]
 
 MIDDLEWARE = [

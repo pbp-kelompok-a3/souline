@@ -12,7 +12,7 @@
         <a href="{% url 'studio:show_studio' %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
           Studio
         </a>
-        <a href="#" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
+        <a href="{% url 'resources:resource_list' %}" class="px-4 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
           Resources
         </a>
         
@@ -28,7 +28,7 @@
           <!-- Dropdown Menu -->
           <div id="more-menu" class="hidden absolute top-full left-0 pt-2 w-48">
             <div class="bg-[#FFF7DD]/85 backdrop-blur-md rounded-lg shadow-xl border border-[#446178]/10 py-2">
-              <a href="#" class="block px-4 py-2 text-[#446178] hover:bg-[#446178]/10 hover:text-[#91C4C3] transition-all duration-300 font-medium">
+              <a href="{% url 'timeline:list' %}" class="block px-4 py-2 text-[#446178] hover:bg-[#446178]/10 hover:text-[#91C4C3] transition-all duration-300 font-medium">
                 Timeline
               </a>
               <a href="{% url 'events:event_list' %}" class="block px-4 py-2 text-[#446178] hover:bg-[#446178]/10 hover:text-[#91C4C3] transition-all duration-300 font-medium">
@@ -52,7 +52,7 @@
       <!-- Right: User Info & Auth (Desktop) -->
       <div class="hidden md:flex items-center space-x-4">
         {% if user.is_authenticated %}
-          <span class="text-[#446178] font-medium">Hello, {{ user.username }}</span>
+          <a href="{% url 'users:profile' %}" class="text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">Hello, {{ user.username }}</a>
           <a href="{% url 'users:logout' %}" 
              class="px-5 py-2 bg-[#FFA04D] text-white rounded-lg hover:bg-[#ff8c2e] transition-all duration-300 font-medium shadow-md hover:shadow-lg">
             Logout
@@ -88,11 +88,11 @@
          class="block px-3 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
         Studio
       </a>
-      <a href="#" 
+      <a href="{% url 'resources:resource_list' %}" 
          class="block px-3 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
         Resources
       </a>
-      <a href="#" 
+      <a href="{% url 'timeline:list' %}" 
          class="block px-3 py-2 rounded-lg text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
         Timeline
       </a>
@@ -109,9 +109,9 @@
       <!-- Mobile Auth Section -->
       <div class="pt-4 border-t border-[#446178]/20 mt-2">
         {% if user.is_authenticated %}
-          <div class="px-3 py-2 text-[#446178] font-medium">
+          <a href="{% url 'users:profile' %}" class="block px-3 py-2 text-[#446178] hover:text-[#91C4C3] transition-all duration-300 font-medium">
             Hello, {{ user.username }}
-          </div>
+          </a>
           <a href="{% url 'users:logout' %}" 
              class="block px-3 py-2 mt-1 bg-[#FFA04D] text-white rounded-lg hover:bg-[#ff8c2e] transition-all duration-300 font-medium text-center">
             Logout

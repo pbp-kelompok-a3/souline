@@ -3,9 +3,6 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from users.models import UserProfile
 
-from studio.models import Studio # punya faza
-admin.site.register(Studio)
-
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
@@ -21,7 +18,7 @@ class UserAdmin(BaseUserAdmin):
         UserProfile.objects.get_or_create(
             user=obj,
             defaults={'kota': 'Jakarta'}  # SUPERUSER BARU otomatis Jakarta
-        ) # mari kita tanya kak danniel apa diperbolehkan
+        )
 # KALAU DIHAPUS SUPERUSER GA ADA KOTA
 # Re-register UserAdmin
 admin.site.unregister(User)

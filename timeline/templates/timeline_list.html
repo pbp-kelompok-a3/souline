@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Timeline | SoulLine{% endblock title %}
+
+{% block content %}
+  {% include "header.html" %}
+
+<div class="max-w-2xl mx-auto py-10 px-4">
+  <!-- Title -->
+  <h1 class="text-3xl font-bold text-[#2E4057] text-center mb-8">Community Timeline</h1>
+
+  <!-- Create Post -->
+  {% if user.is_authenticated %}
+    <form id="postForm" method="post" enctype="multipart/form-data"
+          action="{% url 'timeline:create' %}"
+          class="bg-white border border-[#446178]/10 rounded-2xl shadow-md p-6 space-y-4">
+      {% csrf_token %}
+
+      <!-- Text input area -->
+      <div>
+        <textarea name="{{ post_form.text.name }}"
+                  id="{{ post_form.text.id_for_label }}"
+                  rows="3"
+                  placeholder="What's on your mind?"
+                  class="w-full resize-none rounded-xl border border-[#446178]/20 focus:border-[#FFA04D] focus:ring-2 focus:ring-[#FFA04D]/40 p-3 text-gray-800 placeholder-gray-400 outline-none"></textarea>
+      </div>
+
+      <!-- Media + video section -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-200 pt-4">
+        <div class="flex flex-wrap gap-3 items-center">
+          <!-- Add Photo Button -->
+          <label for="id_image"
+                 class="cursor-pointer inline-flex items-center gap-2 bg-[#FFF7DD] border border-[#446178]/20 px-4 py-2 rounded-full text-[#446178] font-medium hover:bg-[#FFA04D]/10 hover:border-[#FFA04D]/40 transition">
+            Add Photo
+          </label>
+          <input type="file" name="image" id="id_image" class="hidden">
+
+          <!-- Video Link Field -->
+          <input type="url" name="{{ post_form.video_url.name }}"
+                 id="{{ post_form.video_url.id_for_label }}"
+                 placeholder="Paste video link (optional)"
+                 class="flex-1 min-w-[200px] rounded-full border border-[#446178]/20 focus:border-[#FFA04D] focus:ring-1 focus:ring-[#FFA04D]/40 px-4 py-2 text-gray-700 placeholder-gray-400 outline-none" />
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit"
+                class="bg-[#FFA04D] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#ff8c2e] transition shadow-sm hover:shadow-md">
+          Post
+        </button>
+      </div>
+
+      <div id="postErrors" class="text-red-600 text-sm mt-2 hidden"></div>
+    </form>
+  {% else %}
+    <p class="text-center text-dark-blue py-10 bg-card-bg rounded-2xl shadow-sm">
+      Please <a href="{% url 'users:login' %}" class="text-highlight-orange underline">log in</a> to post.
+    </p>
+  {% endif %}
+
+  <!-- Timeline Feed -->
+  <section id="posts" class="mt-10 space-y-6">
+    {% for post in posts %}
+      {% include "_post.html" %}
+    {% empty %}
+      <p class="text-[#F48C06] mt-2 text-lg text-center italic">No posts yet. Be the first!</p>
+    {% endfor %}
+  </section>
+</div>
+
+
+<script src="{% static 'timeline/timeline.js' %}"></script>
+{% endblock content %}

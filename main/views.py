@@ -6,7 +6,8 @@ import datetime
 # Import models
 from studio.models import Studio
 from users.models import UserProfile
-
+from timeline.models import Post
+from timeline.forms import PostForm
 # Create your views here.
 
 # Cek apakah user adalah admin
@@ -24,6 +25,15 @@ def show_main(request):
     else:
         context['studios'] = Studio.objects.all().order_by('?')[:10]
 
+    posts = (
+        Post.objects
+        .select_related('author')
+        .prefetch_related('likes', 'comments__author')
+        .order_by('-created_at')[:10]
+    )
+    post_form = PostForm()
+
+    context['posts'] = posts
+    context['post_form'] = post_form
+
     return render(request, "main/main.html", context)
-
-
