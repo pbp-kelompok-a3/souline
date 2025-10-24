@@ -232,7 +232,7 @@ class StudioViewTest(TestCase):
         self.assertTrue(Studio.objects.filter(nama_studio='New Test Studio').exists())
     
     def test_add_studio_view_admin_post_invalid(self):
-        # Test fungsi add_studio POST dengan data tidak valid
+        # Test add_studio POST request dengan data yang tidak valid
         self.client.login(username='admin', password='adminpass123')
         
         studio_data = {
@@ -243,6 +243,85 @@ class StudioViewTest(TestCase):
         response = self.client.post(reverse('studio:add_studio'), data=studio_data)
         self.assertEqual(response.status_code, 200)  # Tetap di halaman form
         self.assertTemplateUsed(response, 'studio/add_studio.html')
+    
+    def test_edit_studio_view_requires_login(self):
+        # Test bahwa edit_studio memerlukan login
+        response = self.client.get(
+            reverse('studio:edit_studio', kwargs={'id': self.studio_jakarta.id})
+        )
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+        self.assertIn('/users/login/', response.url)
+    
+    def test_edit_studio_view_requires_admin(self):
+        # Test bahwa edit_studio memerlukan hak admin
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(
+            reverse('studio:edit_studio', kwargs={'id': self.studio_jakarta.id})
+        )
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+    
+    def test_edit_studio_view_admin_get(self):
+        # Test edit_studio GET request untuk admin
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.get(
+            reverse('studio:edit_studio', kwargs={'id': self.studio_jakarta.id})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'studio/edit_studio.html')
+        self.assertIn('form', response.context)
+        self.assertIn('studio', response.context)
+        self.assertEqual(response.context['studio'].id, self.studio_jakarta.id)
+    
+    def test_edit_studio_view_admin_post_valid(self):
+        # Test edit_studio POST request dengan data valid
+        self.client.login(username='admin', password='adminpass123')
+        
+        updated_data = {
+            'nama_studio': 'Updated Jakarta Studio',
+            'kota': 'Jakarta',
+            'area': 'Menteng',
+            'alamat': 'Jl. Updated No. 99',
+            'nomor_telepon': '089999999999'
+        }
+        
+        response = self.client.post(
+            reverse('studio:edit_studio', kwargs={'id': self.studio_jakarta.id}),
+            data=updated_data
+        )
+        self.assertEqual(response.status_code, 302)  # Redirect setelah sukses
+        self.assertRedirects(response, reverse('studio:show_studio'))
+        
+        # Cek bahwa studio telah diperbarui
+        self.studio_jakarta.refresh_from_db()
+        self.assertEqual(self.studio_jakarta.nama_studio, 'Updated Jakarta Studio')
+        self.assertEqual(self.studio_jakarta.alamat, 'Jl. Updated No. 99')
+        self.assertEqual(self.studio_jakarta.nomor_telepon, '089999999999')
+    
+    def test_edit_studio_view_admin_post_invalid(self):
+        # Test edit_studio POST request dengan data tidak valid
+        self.client.login(username='admin', password='adminpass123')
+        
+        invalid_data = {
+            'nama_studio': 'Invalid Studio',
+            # Missing required fields
+        }
+        
+        response = self.client.post(
+            reverse('studio:edit_studio', kwargs={'id': self.studio_jakarta.id}),
+            data=invalid_data
+        )
+        self.assertEqual(response.status_code, 200)  # Tetap di halaman form
+        self.assertTemplateUsed(response, 'studio/edit_studio.html')
+    
+    def test_edit_studio_view_nonexistent_studio(self):
+        # Test edit_studio dengan ID studio yang tidak ada
+        self.client.login(username='admin', password='adminpass123')
+        fake_id = uuid.uuid4()
+        
+        response = self.client.get(
+            reverse('studio:edit_studio', kwargs={'id': fake_id})
+        )
+        self.assertEqual(response.status_code, 404)
     
     def test_delete_studio_view_requires_login(self):
         # Test bahwa delete_studio memerlukan login
@@ -286,7 +365,7 @@ class StudioViewTest(TestCase):
             reverse('studio:delete_studio', kwargs={'id': fake_id})
         )
         self.assertEqual(response.status_code, 404)
-
+        
 class StudioURLTest(TestCase):
     # Test case untuk Studio URL
     
@@ -299,6 +378,12 @@ class StudioURLTest(TestCase):
         # Test bahwa add_studio URL dituju dengan benar
         url = reverse('studio:add_studio')
         self.assertEqual(url, '/studio/add/')
+    
+    def test_edit_studio_url_resolves(self):
+        # Test bahwa edit_studio URL dituju dengan benar
+        test_id = uuid.uuid4()
+        url = reverse('studio:edit_studio', kwargs={'id': test_id})
+        self.assertEqual(url, f'/studio/edit/{test_id}/')
     
     def test_show_json_url_resolves(self):
         # Test bahwa show_json URL dituju dengan benar
