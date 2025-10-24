@@ -2,70 +2,301 @@
 
 {% block meta %}
 <title>Profile</title>
+<style>
+    .profile-container {
+        min-height: 100vh;
+        background-color: #FFFBF0;
+        font-family: Arial, sans-serif;
+        padding: 40px 20px;
+    }
+
+    .profile-box {
+        background-color: #FFFFFF;
+        padding: 50px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .navigation {
+        margin-bottom: 30px;
+    }
+
+    .navigation a {
+        color: #446178;
+        text-decoration: none;
+        font-size: 16px;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.3s;
+    }
+
+    .navigation a:hover {
+        color: #3e586d;
+    }
+
+    .profile-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .profile-info p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .profile-info .label {
+        font-weight: 500;
+        display: inline-block;
+        width: 100px;
+    }
+
+    .buttons-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background-color: #446178;
+        color: white;
+    }
+
+    .action-btn:hover {
+        background-color: #3e586d;
+        transform: translateY(-2px);
+    }
+
+    .action-btn.danger {
+        background-color: #dc3545;
+    }
+
+    .action-btn.danger:hover {
+        background-color: #c82333;
+    }
+
+    .form-section {
+        display: none;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        background-color: #446178;
+        color: white;
+    }
+
+    .btn:hover {
+        background-color: #3e586d;
+    }
+
+    .btn.danger {
+        background-color: #dc3545;
+    }
+
+    .btn.danger:hover {
+        background-color: #c82333;
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .messages li {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .messages li.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .messages li.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .logout-link {
+        display: block;
+        text-align: center;
+        margin-top: 30px;
+        color: #446178;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .logout-link:hover {
+        text-decoration: underline;
+    }
+</style>
+<script>
+    function showForm(formId) {
+        const selectedForm = document.getElementById(formId);
+        const isCurrentlyVisible = selectedForm.style.display === 'block';
+        
+        // hide all
+        document.querySelectorAll('.form-section').forEach(form => {
+            form.style.display = 'none';
+        });
+        
+        // not visible rn? show it
+        if (!isCurrentlyVisible) {
+            selectedForm.style.display = 'block';
+        }
+        // was visible, stay hidden
+    }
+</script>
 {% endblock meta %}
 
 {% block content %}
+<div class="profile-container">
+    <div class="profile-box">
+        <div class="navigation">
+            <a href="{% url 'main:main' %}">← Back to Main</a>
+        </div>
 
-<div class="navigation">
-    <p><a href="{% url 'main:main' %}">← Back to Main</a></p>
+        <h1>Your Profile</h1>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li {% if 'success' in message.tags %}class="success"{% else %}class="error"{% endif %}>
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="profile-info">
+            <p><span class="label">Username:</span> {{ request.user.username }}</p>
+            <p><span class="label">Password:</span> ********</p>
+            <p><span class="label">Kota:</span> {{ request.user.profile.kota|default:"Not set" }}</p>
+        </div>
+
+        <div class="buttons-container">
+            <button class="action-btn" onclick="showForm('usernameForm')">Change Username</button>
+            <button class="action-btn" onclick="showForm('passwordForm')">Change Password</button>
+            <button class="action-btn" onclick="showForm('kotaForm')">Change Kota</button>
+            <button class="action-btn danger" onclick="showForm('deleteForm')">Delete Account</button>
+        </div>
+
+        <div id="usernameForm" class="form-section">
+            <form method="POST" action="{% url 'users:change_username' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="new_username">New Username:</label>
+                    <input type="text" name="new_username" id="new_username" required>
+                </div>
+                <div class="form-group">
+                    <label for="current_password_username">Current Password:</label>
+                    <input type="password" name="current_password" id="current_password_username" required>
+                </div>
+                <button type="submit" class="btn">Change Username</button>
+            </form>
+        </div>
+
+        <div id="passwordForm" class="form-section">
+            <form method="POST" action="{% url 'users:change_password' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="old_password">Current Password:</label>
+                    <input type="password" name="old_password" id="old_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password1">New Password:</label>
+                    <input type="password" name="new_password1" id="new_password1" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password2">Confirm New Password:</label>
+                    <input type="password" name="new_password2" id="new_password2" required>
+                </div>
+                <button type="submit" class="btn">Change Password</button>
+            </form>
+        </div>
+
+        <div id="kotaForm" class="form-section">
+            <form method="POST" action="{% url 'users:profile' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+                <div class="form-group">
+                    <label for="current_password_kota">Current Password:</label>
+                    <input type="password" name="current_password" id="current_password_kota" required>
+                </div>
+                <button type="submit" class="btn">Update Kota</button>
+            </form>
+        </div>
+
+        <div id="deleteForm" class="form-section">
+            <p>Warning: Deleting your account is permanent and cannot be undone.</p>
+            <form method="POST" action="{% url 'users:delete_account' %}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="current_password_delete">Current Password:</label>
+                    <input type="password" name="current_password" id="current_password_delete" required>
+                </div>
+                <button type="submit" class="btn danger">Confirm Account Deletion</button>
+            </form>
+        </div>
+
+        <a href="{% url 'users:logout' %}" class="logout-link">Logout</a>
+    </div>
 </div>
-
-<h1>Your Profile</h1>
-
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-<div class="profile">
-    <h2>Account</h2>
-    
-    <h3>Change Username</h3>
-    <form method="POST" action="{% url 'users:change_username' %}">
-        {% csrf_token %}
-        <p>
-            <label for="new_username">New Username:</label>
-            <input type="text" name="new_username" id="new_username" required>
-        </p>
-        <p><input type="submit" value="Change Username" /></p>
-    </form>
-
-    <h3>Change Password</h3>
-    <form method="POST" action="{% url 'users:change_password' %}">
-        {% csrf_token %}
-        <p>
-            <label for="old_password">Current Password:</label>
-            <input type="password" name="old_password" id="old_password" required>
-        </p>
-        <p>
-            <label for="new_password1">New Password:</label>
-            <input type="password" name="new_password1" id="new_password1" required>
-        </p>
-        <p>
-            <label for="new_password2">Confirm New Password:</label>
-            <input type="password" name="new_password2" id="new_password2" required>
-        </p>
-        <p><input type="submit" value="Change Password" /></p>
-    </form>
-
-    <h3>Update Kota</h3>
-    <form method="POST" action="{% url 'users:profile' %}">
-        {% csrf_token %}
-        {{ form.as_table }}
-        <p><input type="submit" value="Save" /></p>
-    </form>
-
-    <h3>Danger Zone</h3>
-    <p>Deleting your account is permanent.</p>
-    <form method="POST" action="{% url 'users:delete_account' %}" onsubmit="return confirm('Are you sure you want to delete your account?');">
-        {% csrf_token %}
-        <input type="submit" value="Delete my account" />
-    </form>
-
-    <p><a href="{% url 'users:logout' %}">Logout</a></p>
-</div>
-
 {% endblock content %}
