@@ -21,7 +21,7 @@
       </h2>
 
       <!-- Tombol Tambah Video (khusus staff/admin) -->
-      {% if user.is_staff %}
+      {% if user.is_staff or user.is_superuser %}
         <div class="flex justify-end mb-6">
           <a href="{% url 'resources:resource_form_page' %}">
             <button class="bg-lightbeige border-2 border-lightblue text-lightblue font-semibold px-5 py-2 rounded-lg shadow-md"
@@ -40,6 +40,7 @@
   <!-- kirim status user ke JS -->
   <script>
    const isStaff = "{{ user.is_staff|yesno:'true,false' }}" === "true";
+   const isSuperuser = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
   </script>
 
   <script>
@@ -83,7 +84,7 @@
                   ${r.level.charAt(0).toUpperCase() + r.level.slice(1)}
                 </span>
 
-                ${isStaff ? `
+                ${(isStaff || isSuperuser) ? `
                   <div class="flex gap-2">
                     <a href="/resources/edit/${r.id}/">
                       <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium">
