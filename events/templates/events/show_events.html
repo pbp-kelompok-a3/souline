@@ -50,9 +50,11 @@
           {% if user.is_staff %}
           <div class="flex justify-center space-x-3 mt-4">
             <a href="{% url 'events:edit_event' event.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600">Edit</a>
-            <a href="{% url 'events:delete_event' event.id %}" 
-               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" 
-               onclick="return confirm('Yakin mau hapus event ini?');">Delete</a>
+            <form action="{% url 'events:delete_event' event.id %}" method="POST" onsubmit="return confirm('Yakin mau hapus event ini?');">
+              {% csrf_token %}
+              <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Delete</button>
+            </form>
+
           </div>
           {% endif %}
         </div>
