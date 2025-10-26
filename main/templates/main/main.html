@@ -226,7 +226,7 @@
             </svg>
             <span>{{ post.comments.count }} {% if post.comments.count == 1 %}comment{% else %}comments{% endif %}</span>
           </div>
-          <a href="{% url 'timeline:post_detail' post.pk %}" class="ml-auto text-[#FFA04D] hover:text-[#ff8c2e] font-medium transition-colors">
+          <a href="{% url 'timeline:detail' post.pk %}" class="ml-auto text-[#FFA04D] hover:text-[#ff8c2e] font-medium transition-colors">
             View Post →
           </a>
         </div>
