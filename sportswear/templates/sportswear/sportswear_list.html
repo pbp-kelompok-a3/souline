@@ -5,6 +5,9 @@
 
 {% block content %}
 {% include "header.html" %}
+
+{% csrf_token %}
+
 <div class="max-w-5xl mx-auto py-12 px-6">
     
     <div class="text-left mb-8">
