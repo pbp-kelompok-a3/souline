@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q 
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponseForbidden, Http404
 from .models import SportswearBrand
 from .forms import SportswearBrandForm
@@ -74,16 +75,14 @@ def edit_brand(request, pk):
     return render(request, 'sportswear/add_edit_brand.html', {'form': form, 'title': 'Edit Brand'})
 
 @login_required
+@require_POST
 def delete_brand(request, pk):
     if not is_admin(request.user):
-        return JsonResponse({'status': 'error', 'message': 'Akses Ditolak.'}, status=403)
+        return JsonResponse({'status': 'error', 'message': 'Access Denied.'}, status=403) 
         
-    if request.method == 'POST':
-        try:
-            brand = get_object_or_404(SportswearBrand, pk=pk)
-            brand.delete()
-            return JsonResponse({'status': 'success'}, status=200)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-            
-    return JsonResponse({'status': 'error', 'message': 'Metode tidak diizinkan.'}, status=405)
+    try:
+        brand = get_object_or_404(SportswearBrand, pk=pk)
+        brand.delete()
+        return JsonResponse({'status': 'success'}, status=200) 
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

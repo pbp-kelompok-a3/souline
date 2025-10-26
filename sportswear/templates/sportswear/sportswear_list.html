@@ -9,7 +9,7 @@
     
     <div class="text-left mb-8">
         <h1 class="text-5xl font-extrabold text-dark-blue">Sportswear</h1>
-        <p class="text-xl mt-1 mb-3 font-semibold text-highlight-orange">Stay Active. Stay Stylish.</p>
+        <p class="text-xl mt-1 mb-3 font-semibold text-highlight-orange">Stay Active, Stay Stylish!</p>
     </div>
 
     <div class="flex flex-col items-center mb-10">
@@ -87,6 +87,7 @@
     function setupDeleteListeners() {
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.onclick = (e) => {
+                e.stopPropagation();
                 e.preventDefault(); 
                 deleteBrand(button.getAttribute('data-id'));
             };
