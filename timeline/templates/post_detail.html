@@ -1,8 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
   {% include "header.html" %}
+
   <div class="max-w-2xl mx-auto py-10 px-4">
     {% include "_post.html" with post=post %}
   </div>
+
   {% include "footer.html" %}
+  
+  <script src="{% static 'timeline/timeline.js' %}"></script>
 {% endblock content %}
