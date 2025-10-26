@@ -8,8 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core import serializers
 
-from users.models import UserProfile
-
 def show_events(request):
     filter_type = request.GET.get('filter')  # 'soon' or 'later'
     today = date.today()
@@ -26,6 +24,10 @@ def show_events(request):
         'events': events,
         'filter_type': filter_type,
     })
+
+def event_detail(request, id):
+    event = get_object_or_404(Event, pk=id)
+    return render(request, 'events/event_detail.html', {'event': event})
 
 @login_required(login_url='/login/')
 def add_event(request):
