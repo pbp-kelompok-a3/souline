@@ -42,9 +42,12 @@
     {% endif %}
   </div>
 
-  <a href="{% url 'timeline:detail' post.pk %}" class="text-highlight-orange hover:underline">
-    Details
+  {% if request.resolver_match.url_name != 'detail' %}
+  <a href="{% url 'timeline:detail' post.pk %}" 
+     class="ml-auto text-[#FFA04D] hover:text-[#ff8c2e] font-medium transition-colors">
+    View Post →
   </a>
+  {% endif %}
 </div>
 
 
