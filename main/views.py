@@ -39,7 +39,7 @@ def show_main(request):
         Post.objects
         .select_related('author')
         .prefetch_related('likes', 'comments__author')
-        .order_by('-created_at')[:5]
+        .order_by('-created_at')[:2]
     )
     post_form = PostForm()
     context['posts'] = posts
