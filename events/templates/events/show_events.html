@@ -46,6 +46,10 @@
           <h2 class="font-semibold text-xl text-[#2E4057]">{{ event.name }}</h2>
           <p class="event-date mt-1 text-gray-500">{{ event.date|date:"d F Y" }}</p>
           <p class="text-gray-600 mt-3 text-sm text-center">{{ event.description|truncatechars:100 }}</p>
+            <a href="{% url 'events:event_detail' event.id %}" 
+              class="mt-4 inline-block bg-[#F48C06] text-white px-4 py-2 rounded-lg hover:bg-[#d97706]">
+              Details
+            </a>
 
           {% if user.is_staff %}
           <div class="flex justify-center space-x-3 mt-4">
