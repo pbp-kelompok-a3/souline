@@ -1,9 +1,12 @@
 import csv
 import time
 import googlemaps
+import requests
+import os
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from main.models import Studio
+from django.core.files.base import ContentFile
+from studio.models import Studio
 from pathlib import Path
 
 
@@ -188,8 +191,18 @@ class Command(BaseCommand):
                 # Get photo from initial result
                 if 'photos' in place and place['photos']:
                     photo_reference = place['photos'][0]['photo_reference']
-                    # Construct photo URL (max width 400px for thumbnails)
-                    thumbnail_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={photo_reference}&key={api_key}"
+                    # Construct photo URL to download the image
+                    photo_api_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={photo_reference}&key={api_key}"
+                    
+                    # Download the image and convert to a hosted URL (not API URL)
+                    try:
+                        response = requests.get(photo_api_url, timeout=10)
+                        if response.status_code == 200:
+                            # Use the final redirected URL (Google's CDN URL without API key)
+                            thumbnail_url = response.url
+                            self.stdout.write(self.style.SUCCESS(f'    -> Downloaded photo from Google CDN'))
+                    except Exception as e:
+                        self.stdout.write(self.style.WARNING(f'    -> Failed to download photo: {str(e)}'))
                 
                 # Get place details for Google Maps URL
                 place_details = gmaps.place(place_id=place_id, fields=['url'])
