@@ -5,6 +5,8 @@ from studio.forms import StudioForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 from users.models import UserProfile
 
@@ -109,3 +111,59 @@ def show_json(request):
         })
     
     return JsonResponse(response_data)
+
+@csrf_exempt
+def create_studio_flutter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            new_studio = Studio.objects.create(
+                nama_studio=data["nama_studio"],
+                thumbnail=data.get("thumbnail", ""),
+                kota=data["kota"],
+                area=data["area"],
+                alamat=data["alamat"],
+                gmaps_link=data.get("gmaps_link", ""),
+                nomor_telepon=data["nomor_telepon"],
+            )
+            new_studio.save()
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def edit_studio_flutter(request, id):
+    if request.method == 'POST':
+        try:
+            studio = Studio.objects.get(id=id)
+            data = json.loads(request.body)
+            
+            studio.nama_studio = data.get("nama_studio", studio.nama_studio)
+            studio.thumbnail = data.get("thumbnail", studio.thumbnail)
+            studio.kota = data.get("kota", studio.kota)
+            studio.area = data.get("area", studio.area)
+            studio.alamat = data.get("alamat", studio.alamat)
+            studio.gmaps_link = data.get("gmaps_link", studio.gmaps_link)
+            studio.nomor_telepon = data.get("nomor_telepon", studio.nomor_telepon)
+            
+            studio.save()
+            return JsonResponse({"status": "success"}, status=200)
+        except Studio.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Studio not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def delete_studio_flutter(request, id):
+    if request.method == 'POST':
+        try:
+            studio = Studio.objects.get(id=id)
+            studio.delete()
+            return JsonResponse({"status": "success"}, status=200)
+        except Studio.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Studio not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error"}, status=401)

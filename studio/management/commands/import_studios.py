@@ -2,20 +2,32 @@ import csv
 import time
 import googlemaps
 import requests
+import os
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.core.files.base import ContentFile
 from studio.models import Studio
 from pathlib import Path
 
 
 class Command(BaseCommand):
-    help = 'Import studios from CSV file'
+    help = 'Import or update studios from CSV file'
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--clear',
             action='store_true',
             help='Clear all existing studios before importing',
+        )
+        parser.add_argument(
+            '--update',
+            action='store_true',
+            help='Update existing studios with new data from CSV',
+        )
+        parser.add_argument(
+            '--update-images',
+            action='store_true',
+            help='Update images for all existing studios',
         )
 
     def handle(self, *args, **options):
@@ -27,6 +39,30 @@ class Command(BaseCommand):
         
         gmaps = googlemaps.Client(key=api_key)
         
+        if options['update_images']:
+            self.stdout.write('Updating images for all studios...')
+            studios = Studio.objects.all()
+            count = studios.count()
+            
+            for i, studio in enumerate(studios, 1):
+                self.stdout.write(f'Processing {i}/{count}: {studio.nama_studio}')
+                
+                # Clear thumbnail
+                studio.thumbnail = None
+                
+                try:
+                    thumbnail_url, _ = self.fetch_place_data(
+                        gmaps, api_key, studio.nama_studio, studio.kota, studio.area
+                    )
+                    studio.thumbnail = thumbnail_url
+                    studio.save()
+                    time.sleep(1)  # Rate limiting
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f'Error updating {studio.nama_studio}: {str(e)}'))
+            
+            self.stdout.write(self.style.SUCCESS('Finished updating all studio images.'))
+            return
+
         # Path to CSV file
         csv_file = Path(__file__).resolve().parent.parent.parent.parent / 'DataSet - List Pilates _ Yoga Studio Jabodetabek (1).csv'
         
@@ -54,6 +90,7 @@ class Command(BaseCommand):
         }
 
         imported_count = 0
+        updated_count = 0
         skipped_count = 0
         
         with open(csv_file, 'r', encoding='utf-8') as file:
@@ -64,6 +101,9 @@ class Command(BaseCommand):
             csv_reader = csv.reader(file)
             
             for row in csv_reader:
+                if len(row) < 5:  # Skip incomplete rows
+                    continue
+                    
                 nama_studio = row[0].strip()
                 wilayah = row[1].strip()
                 area = row[2].strip()
@@ -84,45 +124,76 @@ class Command(BaseCommand):
                     continue
                 
                 # Check if studio already exists
-                if Studio.objects.filter(nama_studio=nama_studio, kota=kota).exists():
-                    self.stdout.write(
-                        self.style.WARNING(f'Studio "{nama_studio}" in {kota} already exists. Skipping.')
-                    )
-                    skipped_count += 1
-                    continue
-                
-                # Fetch Google Places data
-                thumbnail_url, gmaps_link = self.fetch_place_data(
-                    gmaps, api_key, nama_studio, kota, area
-                )
-                
-                # Add delay to respect API rate limits
-                time.sleep(1)
-                
-                # Create studio
                 try:
-                    Studio.objects.create(
-                        nama_studio=nama_studio,
-                        kota=kota,
-                        area=area,
-                        alamat=alamat,
-                        nomor_telepon=nomor_telepon,
-                        thumbnail=thumbnail_url,
-                        gmaps_link=gmaps_link,
-                    )
-                    imported_count += 1
-                    self.stdout.write(
-                        self.style.SUCCESS(f'✓ Imported: {nama_studio} ({kota})')
-                    )
+                    existing_studio = Studio.objects.filter(nama_studio=nama_studio, kota=kota).first()
+                    
+                    if existing_studio:
+                        if options['update']:
+                            # Check if both thumbnail and gmaps_link are already populated
+                            if existing_studio.thumbnail and existing_studio.gmaps_link:
+                                self.stdout.write(
+                                    self.style.WARNING(f'Studio "{nama_studio}" in {kota} already has complete data. Skipping.')
+                                )
+                                skipped_count += 1
+                                continue
+                            
+                            # Update existing studio
+                            existing_studio.area = area
+                            existing_studio.alamat = alamat
+                            existing_studio.nomor_telepon = nomor_telepon
+                            
+                            # Fetch Google Places data only if missing
+                            if not existing_studio.thumbnail or not existing_studio.gmaps_link:
+                                thumbnail_url, gmaps_link = self.fetch_place_data(
+                                    gmaps, api_key, nama_studio, kota, area
+                                )
+                                existing_studio.thumbnail = thumbnail_url
+                                existing_studio.gmaps_link = gmaps_link
+                                time.sleep(1)  # Rate limiting
+                            
+                            existing_studio.save()
+                            updated_count += 1
+                            self.stdout.write(
+                                self.style.SUCCESS(f'[UPDATE] Updated: {nama_studio} ({kota})')
+                            )
+                        else:
+                            self.stdout.write(
+                                self.style.WARNING(f'Studio "{nama_studio}" in {kota} already exists. Skipping.')
+                            )
+                            skipped_count += 1
+                    else:
+                        # Fetch Google Places data for new studio
+                        thumbnail_url, gmaps_link = self.fetch_place_data(
+                            gmaps, api_key, nama_studio, kota, area
+                        )
+                        time.sleep(1)  # Rate limiting
+                        
+                        # Create new studio
+                        Studio.objects.create(
+                            nama_studio=nama_studio,
+                            kota=kota,
+                            area=area,
+                            alamat=alamat,
+                            nomor_telepon=nomor_telepon,
+                            thumbnail=thumbnail_url,
+                            gmaps_link=gmaps_link,
+                        )
+                        imported_count += 1
+                        self.stdout.write(
+                            self.style.SUCCESS(f'✓ Imported: {nama_studio} ({kota})')
+                        )
+                        
                 except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f'Error importing {nama_studio}: {str(e)}')
+                        self.style.ERROR(f'Error processing {nama_studio}: {str(e)}')
                     )
                     skipped_count += 1
         
         # Summary
         self.stdout.write(self.style.SUCCESS(f'\n=== Import Complete ==='))
         self.stdout.write(self.style.SUCCESS(f'Successfully imported: {imported_count} studios'))
+        if updated_count > 0:
+            self.stdout.write(self.style.SUCCESS(f'Successfully updated: {updated_count} studios'))
         if skipped_count > 0:
             self.stdout.write(self.style.WARNING(f'Skipped: {skipped_count} studios'))
     
