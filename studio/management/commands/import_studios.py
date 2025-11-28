@@ -51,10 +51,11 @@ class Command(BaseCommand):
                 studio.thumbnail = None
                 
                 try:
-                    thumbnail_url, _ = self.fetch_place_data(
+                    thumbnail_url, _, rating = self.fetch_place_data(
                         gmaps, api_key, studio.nama_studio, studio.kota, studio.area
                     )
                     studio.thumbnail = thumbnail_url
+                    studio.rating = rating
                     studio.save()
                     time.sleep(1)  # Rate limiting
                 except Exception as e:
@@ -144,11 +145,12 @@ class Command(BaseCommand):
                             
                             # Fetch Google Places data only if missing
                             if not existing_studio.thumbnail or not existing_studio.gmaps_link:
-                                thumbnail_url, gmaps_link = self.fetch_place_data(
+                                thumbnail_url, gmaps_link, rating = self.fetch_place_data(
                                     gmaps, api_key, nama_studio, kota, area
                                 )
                                 existing_studio.thumbnail = thumbnail_url
                                 existing_studio.gmaps_link = gmaps_link
+                                existing_studio.rating = rating
                                 time.sleep(1)  # Rate limiting
                             
                             existing_studio.save()
@@ -163,7 +165,7 @@ class Command(BaseCommand):
                             skipped_count += 1
                     else:
                         # Fetch Google Places data for new studio
-                        thumbnail_url, gmaps_link = self.fetch_place_data(
+                        thumbnail_url, gmaps_link, rating = self.fetch_place_data(
                             gmaps, api_key, nama_studio, kota, area
                         )
                         time.sleep(1)  # Rate limiting
@@ -177,6 +179,7 @@ class Command(BaseCommand):
                             nomor_telepon=nomor_telepon,
                             thumbnail=thumbnail_url,
                             gmaps_link=gmaps_link,
+                            rating=rating,
                         )
                         imported_count += 1
                         self.stdout.write(
@@ -199,9 +202,10 @@ class Command(BaseCommand):
     
     def fetch_place_data(self, gmaps, api_key, nama_studio, kota, area):
         """
-        Fetch thumbnail and Google Maps link for a studio using Google Places API
+        Fetch thumbnail, Google Maps link, and rating for a studio using Google Places API
         """
         placeholder_image = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+        rating = 5.0
         
         try:
             # Search query for better accuracy
@@ -213,6 +217,7 @@ class Command(BaseCommand):
             if places_result['status'] == 'OK' and places_result['results']:
                 place = places_result['results'][0]
                 place_id = place.get('place_id')
+                rating = place.get('rating', 5.0)
                 
                 thumbnail_url = placeholder_image
                 gmaps_link = f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}"
@@ -241,18 +246,18 @@ class Command(BaseCommand):
                     gmaps_link = place_details['result']['url']
                 
                 self.stdout.write(
-                    self.style.SUCCESS(f'  -> Found place data for {nama_studio}')
+                    self.style.SUCCESS(f'  -> Found place data for {nama_studio} (Rating: {rating})')
                 )
-                return thumbnail_url, gmaps_link
+                return thumbnail_url, gmaps_link, rating
             else:
                 self.stdout.write(
                     self.style.WARNING(f'  -> Place not found for {nama_studio}, using placeholder')
                 )
-                return placeholder_image, f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}"
+                return placeholder_image, f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}", rating
                 
         except Exception as e:
             self.stdout.write(
                 self.style.WARNING(f'  -> Error fetching place data for {nama_studio}: {str(e)}')
             )
             query = f"{nama_studio} {kota} Indonesia"
-            return placeholder_image, f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}"
+            return placeholder_image, f"https://www.google.com/maps/search/?api=1&query={query.replace(' ', '+')}", rating

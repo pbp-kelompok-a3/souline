@@ -75,7 +75,8 @@
             <h3 class="text-xl font-semibold text-[#446178] mb-2 leading-tight">{{ studio.nama_studio }}</h3>
             <p class="text-[#91C4C3] font-medium text-sm mb-1">📍 {{ studio.area }}, {{ studio.get_kota_display }}</p>
             <p class="text-gray-600 text-sm mb-1 leading-relaxed">📍 {{ studio.alamat }}</p>
-            <p class="text-gray-600 text-sm mb-3 leading-relaxed">📞 {{ studio.nomor_telepon }}</p>
+            <p class="text-gray-600 text-sm mb-1 leading-relaxed">📞 {{ studio.nomor_telepon }}</p>
+            <p class="text-gray-600 text-xs sm:text-sm mb-3 leading-relaxed">⭐ {{ studio.rating }}</p>
             <a href="{{ studio.gmaps_link }}" target="_blank" rel="noopener" 
                class="inline-block mt-2 px-4 py-2 bg-[#FFA04D] text-white rounded-lg text-sm font-medium hover:bg-[#ff8c2e] hover:scale-105 hover:shadow-md transition-all duration-300">
               View on Google Maps →

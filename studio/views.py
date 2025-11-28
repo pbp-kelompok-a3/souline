@@ -87,6 +87,7 @@ def show_json(request):
                 'alamat': studio.alamat,
                 'gmaps_link': studio.gmaps_link or '',
                 'nomor_telepon': studio.nomor_telepon,
+                'rating': studio.rating,
             } for studio in studios]
         })
     
@@ -107,6 +108,7 @@ def show_json(request):
                 'alamat': studio.alamat,
                 'gmaps_link': studio.gmaps_link or '',
                 'nomor_telepon': studio.nomor_telepon,
+                'rating': studio.rating,
             } for studio in studios]
         })
     
@@ -125,6 +127,7 @@ def create_studio_flutter(request):
                 alamat=data["alamat"],
                 gmaps_link=data.get("gmaps_link", ""),
                 nomor_telepon=data["nomor_telepon"],
+                rating=data.get("rating", 5.0),
             )
             new_studio.save()
             return JsonResponse({"status": "success"}, status=200)
@@ -146,6 +149,7 @@ def edit_studio_flutter(request, id):
             studio.alamat = data.get("alamat", studio.alamat)
             studio.gmaps_link = data.get("gmaps_link", studio.gmaps_link)
             studio.nomor_telepon = data.get("nomor_telepon", studio.nomor_telepon)
+            studio.rating = data.get("rating", studio.rating)
             
             studio.save()
             return JsonResponse({"status": "success"}, status=200)
