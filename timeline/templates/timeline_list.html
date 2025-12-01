@@ -36,11 +36,29 @@
           </label>
           <input type="file" name="image" id="id_image" class="hidden">
 
+          <!-- Resource Dropdown -->
+          <select name="{{ resources.resource.name }}"
+                  class="flex-1 min-w-[150px] rounded-full border border-[#446178]/20 focus:border-[#FFA04D] focus:ring-1 focus:ring-[#FFA04D]/40 px-4 py-2 text-gray-700 placeholder-gray-400 outline-none">
+            <option value="" selected>Resource</option>
+            {% for resource in resources %}
+              <option value="{{ resource.title }}">{{ resource.title }}</option>
+            {% endfor %}
+          </select>
+
+          <!-- Sportswear Dropdown -->
+          <select name="{{ post_form.sportswear.name }}"  
+                  class="flex-1 min-w-[150px] rounded-full border border-[#446178]/20 focus:border-[#FFA04D] focus:ring-1 focus:ring-[#FFA04D]/40 px-4 py-2 text-gray-700 placeholder-gray-400 outline-none">
+            <option value="" selected>Sportswear</option>
+            {% for sportswear in post_form.fields.sportswear.queryset %}
+              <option value="{{ sportswear.name }}">{{ sportswear.name }}</option>
+            {% endfor %}
+          </select>
+
           <!-- Video Link Field -->
-          <input type="url" name="{{ post_form.video_url.name }}"
+          <!-- <input type="url" name="{{ post_form.video_url.name }}"
                  id="{{ post_form.video_url.id_for_label }}"
                  placeholder="Paste video link (optional)"
-                 class="flex-1 min-w-[200px] rounded-full border border-[#446178]/20 focus:border-[#FFA04D] focus:ring-1 focus:ring-[#FFA04D]/40 px-4 py-2 text-gray-700 placeholder-gray-400 outline-none" />
+                 class="flex-1 min-w-[200px] rounded-full border border-[#446178]/20 focus:border-[#FFA04D] focus:ring-1 focus:ring-[#FFA04D]/40 px-4 py-2 text-gray-700 placeholder-gray-400 outline-none" /> -->
         </div>
 
         <!-- Submit button -->
