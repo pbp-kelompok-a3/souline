@@ -4,14 +4,20 @@ from django.db import models
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from resources.models import Resource
+from sportswear.models import SportswearBrand
+from users.models import UserProfile
+from django.contrib.auth.models import User
 
-User = settings.AUTH_USER_MODEL
+
+# User = settings.AUTH_USER_MODEL
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     text = models.TextField(blank=True)
     image = models.ImageField(upload_to='timeline_images/', blank=True, null=True)
-    video_url = models.URLField(blank=True, null=True, help_text='Optional video link (YouTube, Vimeo, etc.)')
+    resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
+    sportswear = models.ForeignKey(SportswearBrand, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
