@@ -21,6 +21,7 @@ class Studio(models.Model):
     alamat = models.TextField()
     gmaps_link = models.URLField(max_length=500, blank=True, null=True)
     nomor_telepon = models.CharField(max_length=20)
+    rating = models.FloatField()
 
     def __str__(self):
         return self.nama_studio
