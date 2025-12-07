@@ -117,6 +117,9 @@ def show_json(request):
 @csrf_exempt
 def create_studio_flutter(request):
     if request.method == 'POST':
+        if not request.user.is_authenticated or not is_admin(request.user):
+            return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+            
         try:
             data = json.loads(request.body)
             new_studio = Studio.objects.create(
@@ -138,6 +141,9 @@ def create_studio_flutter(request):
 @csrf_exempt
 def edit_studio_flutter(request, id):
     if request.method == 'POST':
+        if not request.user.is_authenticated or not is_admin(request.user):
+            return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+
         try:
             studio = Studio.objects.get(id=id)
             data = json.loads(request.body)
@@ -162,6 +168,9 @@ def edit_studio_flutter(request, id):
 @csrf_exempt
 def delete_studio_flutter(request, id):
     if request.method == 'POST':
+        if not request.user.is_authenticated or not is_admin(request.user):
+            return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+
         try:
             studio = Studio.objects.get(id=id)
             studio.delete()

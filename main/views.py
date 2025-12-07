@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.http import JsonResponse
 from datetime import date, timedelta
 import datetime
 
@@ -55,3 +56,9 @@ def show_main(request):
     context['sportswear_brands'] = sportswear_brands
 
     return render(request, "main/main.html", context)
+
+def is_admin_flutter(request):
+    if request.user.is_authenticated:
+        is_admin_user = request.user.is_superuser or request.user.is_staff
+        return JsonResponse({"is_admin": is_admin_user}, status=200)
+    return JsonResponse({"is_admin": False}, status=200)
