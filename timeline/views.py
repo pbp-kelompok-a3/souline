@@ -56,13 +56,26 @@ def toggle_like(request, pk):
 @require_POST
 def add_comment(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    body = json.loads(request.body.decode('utf-8'))
-    content = body.get('content')
+    content = request.POST.get('text')   # <-- HTML form sends name="text"
+
     if not content:
         return JsonResponse({'error': 'empty'}, status=400)
-    comment = Comment.objects.create(post=post, author=request.user, text=content)
-    return JsonResponse({'id': comment.id, 'author_username': comment.author.username, 'content': comment.text}, status=201)
-    
+
+    comment = Comment.objects.create(
+        post=post,
+        author=request.user,
+        text=content
+    )
+
+    return JsonResponse(
+        {
+            'id': comment.id,
+            'author_username': comment.author.username,
+            'content': comment.text
+        },
+        status=201
+    )
+
 def post_detail(request, pk):
     post = get_object_or_404(Post.objects.select_related('author').prefetch_related('comments__author', 'likes'), pk=pk)
     comment_form = CommentForm()
