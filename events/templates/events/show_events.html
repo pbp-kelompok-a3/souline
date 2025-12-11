@@ -51,7 +51,7 @@
               Details
             </a>
 
-          {% if user.is_staff %}
+          {% if user == event.owner %}
           <div class="flex justify-center space-x-3 mt-4">
             <a href="{% url 'events:edit_event' event.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600">Edit</a>
             <form action="{% url 'events:delete_event' event.id %}" method="POST" onsubmit="return confirm('Yakin mau hapus event ini?');">
@@ -68,8 +68,8 @@
     {% endif %}
   </div>
 
-  <!-- Add Event Button (admin only) -->
-  {% if request.user.is_staff %}
+  <!-- Add Event Button (logged in user) -->
+  {% if user.is_authenticated %}
   <div class="flex justify-start w-full max-w-6xl mt-14">
     <a href="{% url 'events:add_event' %}" class="add-btn shadow-md">
        + Add Event
