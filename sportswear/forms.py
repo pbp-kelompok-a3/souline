@@ -10,7 +10,9 @@ class SportswearBrandForm(forms.ModelForm):
             'brand_name', 
             'description', 
             'link', 
-            'thumbnail_url'
+            'thumbnail_url',
+            'category_tag', 
+            'average_rating'
         ]
         
         widgets = {
