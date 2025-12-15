@@ -177,27 +177,6 @@ def timeline_json(request):
         'previous': None,
     })
 
-def resource_list_json(request):
-    resources = Resource.objects.all().order_by('-created_at')
-    data = [{
-        "id": r.id,
-        "title": r.title,
-        "thumbnail": r.thumbnail_url,
-        "youtube_url": r.youtube_url,
-        "level": r.level
-    } for r in resources]
-    return JsonResponse(data, safe=False)
-
-def sportswear_list_json(request):
-    brands = SportswearBrand.objects.all()
-    data = [{
-        "id": b.id,
-        "brand_name": b.brand_name,
-        "thumbnail": b.thumbnail_url,
-        "link": b.link
-    } for b in brands]
-    return JsonResponse(data, safe=False)
-
 @csrf_exempt
 @login_required
 @require_POST
