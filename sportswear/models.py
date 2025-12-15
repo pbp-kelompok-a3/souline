@@ -1,5 +1,4 @@
 from django.db import models
-from timeline.models import Post
 from django.contrib.auth import get_user_model
 
 class SportswearBrand(models.Model):
