@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     'users',
     'sportswear',
     'timeline',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
