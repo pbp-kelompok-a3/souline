@@ -12,9 +12,19 @@ urlpatterns = [
     path('post/<int:pk>/like/', views.toggle_like, name='like'),
     path('post/<int:pk>/comment/', views.add_comment, name='add_comment'),
     path('json/', views.show_json, name='show_json'),
-    path('api/timeline/', views.timeline_json),
-    path('api/post/<int:pk>/like/', views.toggle_like),
-    path('api/post/<int:pk>/comments/', views.comments_list),
-    path('api/post/<int:pk>/comment/', views.add_comment),
-    path('api/create_post/', views.create_post_api, name='create_post_api'),
+
+
+    path('api/timeline/', views.timeline_json, name='api_timeline'),
+    
+    path('create_post_flutter/', views.create_post_api, name='create_post_api'),
+    path('like_post_flutter/<int:pk>/', views.toggle_like_api, name='like_post_api'),
+    path('add_comment_flutter/<int:pk>/', views.add_comment_api, name='add_comment_api'),
+    
+    path('api/create_post/', views.create_post_api), 
+    path('api/post/<int:pk>/like/', views.toggle_like_api),
+    path('api/post/<int:pk>/comment/', views.add_comment_api),
+    path('api/comment/<int:pk>/edit/', views.edit_comment_api, name='edit_comment_api'),
+    path('api/comment/<int:pk>/delete/', views.delete_comment_api, name='delete_comment_api'),
+    path('api/select_resources/', views.resource_list_json, name='select_resources'),
+    path('api/select_sportswear/', views.sportswear_list_json, name='select_sportswear'),
 ]
