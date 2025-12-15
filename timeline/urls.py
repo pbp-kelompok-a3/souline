@@ -25,6 +25,4 @@ urlpatterns = [
     path('api/post/<int:pk>/comment/', views.add_comment_api),
     path('api/comment/<int:pk>/edit/', views.edit_comment_api, name='edit_comment_api'),
     path('api/comment/<int:pk>/delete/', views.delete_comment_api, name='delete_comment_api'),
-    path('api/select_resources/', views.resource_list_json, name='select_resources'),
-    path('api/select_sportswear/', views.sportswear_list_json, name='select_sportswear'),
 ]
