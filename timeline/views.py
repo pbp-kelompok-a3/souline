@@ -1,28 +1,27 @@
 import json
-from django.shortcuts import render 
-from django.contrib.auth.decorators import login_required 
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden 
-from django.shortcuts import get_object_or_404, render, redirect 
-from django.views.decorators.http import require_POST 
-from django.core.paginator import Paginator 
-from django.template.loader import render_to_string 
-from .forms import PostForm, CommentForm 
-from .models import Post, Comment, Resource, SportswearBrand
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from .forms import PostForm, CommentForm
+from .models import Post, Comment, Resource, SportswearBrand
 
 def timeline_list(request):
     posts_qs = Post.objects.select_related('author').prefetch_related('likes', 'comments__author').all().order_by('created_at')
-    
     paginator = Paginator(posts_qs, 10)
     page = request.GET.get('page', 1)
     posts = paginator.get_page(page)
 
-    post_form = PostForm() 
-    comment_form = CommentForm() 
-    context = { 
-        'posts': posts, 
-        'post_form': post_form, 
-        'comment_form': comment_form, } 
+    post_form = PostForm()
+    comment_form = CommentForm()
+    context = {
+        'posts': posts,
+        'post_form': post_form,
+        'comment_form': comment_form,
+    }
     return render(request, 'timeline_list.html', context)
 
 @login_required
@@ -35,7 +34,6 @@ def create_post(request):
     post.author = request.user
     post.save()
 
-    from django.template.loader import render_to_string
     html = render_to_string('_post.html', {'post': post, 'user': request.user}, request=request)
     return JsonResponse({'success': True, 'html': html})
 
@@ -56,25 +54,16 @@ def toggle_like(request, pk):
 @require_POST
 def add_comment(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    content = request.POST.get('text')   # <-- HTML form sends name="text"
-
+    content = request.POST.get('text')
     if not content:
         return JsonResponse({'error': 'empty'}, status=400)
 
-    comment = Comment.objects.create(
-        post=post,
-        author=request.user,
-        text=content
-    )
-
-    return JsonResponse(
-        {
-            'id': comment.id,
-            'author_username': comment.author.username,
-            'content': comment.text
-        },
-        status=201
-    )
+    comment = Comment.objects.create(post=post, author=request.user, text=content)
+    return JsonResponse({
+        'id': comment.id,
+        'author_username': comment.author.username,
+        'content': comment.text
+    }, status=201)
 
 def post_detail(request, pk):
     post = get_object_or_404(Post.objects.select_related('author').prefetch_related('comments__author', 'likes'), pk=pk)
@@ -94,10 +83,8 @@ def edit_post(request, pk):
 
     post.text = text
     post.save()
-
     html = render_to_string('_post.html', {'post': post, 'user': request.user}, request=request)
     return JsonResponse({'success': True, 'html': html})
-
 
 @login_required
 @require_POST
@@ -105,48 +92,84 @@ def delete_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if post.author != request.user:
         return JsonResponse({'success': False, 'error': 'permission_denied'}, status=403)
-
     post.delete()
     return JsonResponse({'success': True})
 
 def show_json(request):
     posts = Post.objects.all().order_by('-created_at')
-
     data = []
     for post in posts:
         data.append({
-            # "id": post.id,
             "username": post.author.username,
             "text": post.text,
-            "image": post.image.url if post.image else None,
+            "image": post.image.url if post.image else "",
             "created_at": post.created_at.isoformat(),
         })
-
     return JsonResponse(data, safe=False)
+
+
+
 
 def timeline_json(request):
     page = int(request.GET.get('page', 1))
-    posts_qs = Post.objects.select_related('author').all().order_by('-created_at')
+    posts_qs = (
+        Post.objects
+        .select_related('author')
+        .prefetch_related('comments__author', 'likes') 
+        .order_by('-created_at')
+    )
+
     paginator = Paginator(posts_qs, 10)
     page_obj = paginator.get_page(page)
 
-    next_url = None
-    if page_obj.has_next():
-        next_url = f"?page={page_obj.next_page_number()}"
+    next_url = f"?page={page_obj.next_page_number()}" if page_obj.has_next() else None
 
     results = []
     for p in page_obj.object_list:
+        comments_list = [
+            {
+                'id': c.id,
+                'author_username': c.author.username,
+                'content': c.text,
+                'created_at': c.created_at.isoformat(),
+            }
+            for c in p.comments.all().order_by('-created_at')
+        ]
+
+        attachment_data = None
+        if p.resource: 
+            attachment_data = {
+                "type": "Resources",
+                "id": p.resource.id,
+                "name": p.resource.title,
+                "thumbnail": p.resource.thumbnail_url if p.resource.thumbnail_url else "",
+                "link": p.resource.link if hasattr(p.resource, 'link') else ""
+            }
+        elif p.sportswear: 
+            attachment_data = {
+                "type": "Sportswear",
+                "id": p.sportswear.id,
+                "name": p.sportswear.title,
+                "thumbnail": p.sportswear.thumbnail_url if p.sportswear.thumbnail_url else "",
+                "link": p.sportswear.link if hasattr(p.sportswear, 'link') else ""
+            }
+
+        is_liked = False
+        if request.user.is_authenticated:
+            is_liked = request.user in p.likes.all()
+
         results.append({
-        'id': p.id,
-        'author_username': p.author.username,
-        'text': p.text,
-        'image': p.image.url if p.image else None,
-        'resource_title': p.resource.title if getattr(p, 'resource', None) else None,
-        'resource_thumbnail': p.resource.thumbnail_url if getattr(p, 'resource', None) else None,
-        'like_count': p.like_count,
-        'liked_by_user': False, # if auth: detect
-        'comment_count': p.comments.count(),
-    })
+            'id': p.id,
+            'author_username': p.author.username,
+            'text': p.text,
+            'image': p.image.url if p.image else "",
+            'like_count': p.like_count,
+            'liked_by_user': is_liked,  
+            'comment_count': len(comments_list),
+            'comments': comments_list,
+            'created_at': p.created_at.isoformat(),
+            'attachment': attachment_data, 
+        })
 
     return JsonResponse({
         'results': results,
@@ -154,21 +177,8 @@ def timeline_json(request):
         'previous': None,
     })
 
-def comments_list(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    data = []
-    for c in post.comments.select_related('author').all().order_by('-created_at'):
-        data.append({
-        'id': c.id,
-        'author_username': c.author.username,
-        'content': c.text,
-        'created_at': c.created_at.isoformat(),
-    })
-    return JsonResponse(data, safe=False)
-
 def resource_list_json(request):
     resources = Resource.objects.all().order_by('-created_at')
-
     data = [{
         "id": r.id,
         "title": r.title,
@@ -176,46 +186,127 @@ def resource_list_json(request):
         "youtube_url": r.youtube_url,
         "level": r.level
     } for r in resources]
-
     return JsonResponse(data, safe=False)
 
 def sportswear_list_json(request):
     brands = SportswearBrand.objects.all()
-
     data = [{
         "id": b.id,
         "brand_name": b.brand_name,
         "thumbnail": b.thumbnail_url,
         "link": b.link
     } for b in brands]
-
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
 @login_required
 @require_POST
 def create_post_api(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'POST only'}, status=405)
+    try:
+        data = json.loads(request.body)
+        text = data.get('text')
+        
+        post = Post.objects.create(
+            author=request.user,
+            text=text or ''
+        )
 
-    text = request.POST.get('text')
-    resource_id = request.POST.get('resource_id')
-    sportswear_id = request.POST.get('sportswear_id')
+        attachment = data.get('attachment')
+        if attachment:
+            atype = attachment.get('type') or attachment.get('tag')
+            aid = attachment.get('id')
+            if not aid and 'data' in attachment:
+                aid = attachment['data'].get('id')
 
-    post = Post.objects.create(
-        author=request.user,
-        text=text or ''
-    )
+            if aid:
+                if atype == 'Resources':
+                    if Resource.objects.filter(id=aid).exists():
+                        post.resource_id = aid
+                elif atype == 'Sportswear':
+                    if SportswearBrand.objects.filter(id=aid).exists():
+                        post.sportswear_id = aid
+        
+        post.save()
+        return JsonResponse({"status": "success", "message": "Post created successfully!"})
 
-    if resource_id:
-        post.resource_id = resource_id
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
-    if sportswear_id:
-        post.sportswear_id = sportswear_id
+@csrf_exempt
+@login_required
+@require_POST
+def toggle_like_api(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    user = request.user
 
-    if 'image' in request.FILES:
-        post.image = request.FILES['image']
+    if user in post.likes.all():
+        post.likes.remove(user)
+        message = 'Unliked'
+    else:
+        post.likes.add(user)
+        message = 'Liked'
 
-    post.save()
+    return JsonResponse({'status': 'success', 'message': message})
 
-    return JsonResponse({"success": True, "post_id": post.id})
+@csrf_exempt
+@login_required
+@require_POST
+def add_comment_api(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    
+    try:
+        data = json.loads(request.body)
+        content = data.get('content') or data.get('text')
+
+        if not content:
+            return JsonResponse({'status': 'error', 'message': 'Comment content cannot be empty'}, status=400)
+
+        comment = Comment.objects.create(
+            post=post,
+            author=request.user,
+            text=content
+        )
+        return JsonResponse({'status': 'success', 'message': 'Comment added'})
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@csrf_exempt
+@login_required
+@require_POST
+def edit_comment_api(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if comment.author != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    try:
+        data = json.loads(request.body)
+        content = data.get('content') or data.get('text')
+
+        if not content:
+            return JsonResponse({'status': 'error', 'message': 'Comment content cannot be empty'}, status=400)
+
+        comment.text = content
+        comment.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Comment updated successfully'})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+
+@csrf_exempt
+@login_required
+@require_POST
+def delete_comment_api(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if comment.author != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    comment.delete()
+
+    return JsonResponse({'status': 'success', 'message': 'Comment deleted successfully'})
