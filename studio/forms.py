@@ -6,4 +6,4 @@ from studio.models import Studio
 class StudioForm(ModelForm):
     class Meta:
         model = Studio
-        fields = ['nama_studio', 'thumbnail', 'kota', 'area', 'alamat', 'gmaps_link', 'nomor_telepon']
+        fields = ['nama_studio', 'thumbnail', 'kota', 'area', 'alamat', 'nomor_telepon', 'rating', 'gmaps_link']

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} | Sportswear{% endblock %}
+
+{% block content %}
+{% include "header.html" %}
+<div class="max-w-xl mx-auto py-12 px-6">
+    
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-dark-blue">{{ title }} </h1>
+        <p class="text-lg mt-1 font-semibold text-highlight-orange">Please fill in the details below to add a new brand.</p>
+    </div>
+
+    <div class="bg-card-bg shadow-lg rounded-3xl p-8 md:p-10">
+        
+        <form id="brand-form" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="flex flex-col">
+                <label for="{{ field.id_for_label }}" class="mb-1 text-sm font-medium text-gray-700">
+                    {{ field.label }}
+                </label>
+                
+                {{ field }}
+                
+                <div id="error-{{ field.id_for_label }}" class="mt-1 text-sm text-red-500">
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="pt-4 flex justify-center">
+                <button type="submit" 
+                        class="px-8 py-2 border border-blue-300 text-blue-400 rounded-lg hover:bg-blue-50 transition duration-150 ease-in-out font-medium">
+                    {{ title }} 
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="mt-8 text-center">
+        <a href="{% url 'sportswear:show_sportswear' %}" 
+           class="text-dark-blue hover:text-highlight-orange transition duration-150">
+           ← Back to Brand List
+        </a>
+    </div>
+</div>
+{% include "footer.html" %}
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const form = document.getElementById('brand-form');
+    
+    function clearErrors() {
+        document.querySelectorAll('.text-red-500').forEach(el => el.innerHTML = '');
+    }
+
+    function displayErrors(errors) {
+        clearErrors(); 
+        for (const fieldName in errors) {
+            const errorContainer = document.getElementById(`error-id_${fieldName}`);
+            if (errorContainer) {
+                errors[fieldName].forEach(error => {
+                    errorContainer.innerHTML += `<p>${error}</p>`;
+                });
+            }
+        }
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); 
+
+        const formData = new FormData(form);
+        const currentPath = window.location.pathname; 
+
+        clearErrors();
+
+        fetch(currentPath, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest' 
+            },
+            body: formData 
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 200 && body.status === 'success') {
+                alert(body.message);
+                window.location.href = '{% url "sportswear:show_sportswear" %}';
+            } else if (status === 400 && body.status === 'error') {
+                alert("Gagal menyimpan brand. Cek kembali isian Anda.");
+                displayErrors(body.errors);
+            } else {
+                alert(body.message || 'An unexpected error occurred.');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            alert('A network error occurred.');
+        });
+    });
+</script>
+{% endblock %}
