@@ -27,6 +27,7 @@ urlpatterns = [
     path('resources/', include('resources.urls')),
     path('users/', include('users.urls')),
     path('sportswear/', include('sportswear.urls')),
+    path('auth/', include('auth.urls')),
     path('timeline/', include('timeline.urls')),
 ]
 
