@@ -4,7 +4,7 @@ from .models import Event
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['poster', 'name', 'date', 'description']
+        fields = ['poster', 'name', 'date', 'description', 'location']
 
         widgets = {
             'name': forms.TextInput(attrs={
@@ -23,5 +23,9 @@ class EventForm(forms.ModelForm):
             'poster': forms.ClearableFileInput(attrs={
                 'class': 'hidden',  # biar ngikut style upload kotak plus tadi
                 'accept': 'image/*'
+            }),
+            'location': forms.TextInput(attrs={
+                'placeholder': 'Enter event location',
+                'class': 'w-full rounded-md border border-gray-300 px-3 py-2 mt-1 text-gray-700 focus:ring-2 focus:ring-[#F48C06] focus:outline-none'
             }),
         }

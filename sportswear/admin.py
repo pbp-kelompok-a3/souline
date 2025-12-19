@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import SportswearBrand, BrandReview 
 
-# Register your models here.
+admin.site.register(SportswearBrand)
+admin.site.register(BrandReview) 

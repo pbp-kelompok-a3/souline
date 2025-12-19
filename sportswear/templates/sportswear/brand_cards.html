@@ -18,15 +18,29 @@
                     <h5 class="text-xl font-bold mb-1 text-dark-blue">{{ brand.brand_name }}</h5>
                     <p class="text-gray-600 text-sm">{{ brand.description|truncatechars:80 }}</p>
                     
+                    {% for review in brand.latest_reviews %}
+                        <div class="mb-2 p-2 border border-blue-100 rounded-lg bg-blue-50">
+                            {# Mengakses field text langsung dari model Review #}
+                            <p class="text-xs italic text-gray-800">
+                                "{{ review.review_text|default:'(No review text)'|truncatechars:50 }}"
+                            </p>
+                            {# Mengakses username dari relasi Foreign Key 'reviewer' #}
+                            <p class="text-xs font-medium text-gray-500 mt-1 text-right">
+                                — {{ review.reviewer.username|default:review.reviewer }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                    
                     {% if user.is_authenticated and user.is_staff %}
                         <div class="mt-3 pt-3 border-t border-gray-200 flex justify-end">
                             <a href="{% url 'sportswear:edit_brand' brand.pk %}" 
                                class="text-xs font-semibold px-3 py-1 bg-yellow-400 text-white rounded-full hover:bg-yellow-500 mr-2 z-10">
                                 ✏️ Edit
                             </a>
-                            <button class="delete-btn text-xs font-semibold px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10" 
-                                    data-id="{{ brand.pk }}">
-                                🗑️ Hapus
+                            <button type="button" 
+                                class="delete-btn text-xs font-semibold px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10"
+                                data-id="{{ brand.pk }}">
+                                🗑️ Delete
                             </button>
                         </div>
                     {% endif %}
@@ -35,6 +49,6 @@
         </a> </div>
 {% empty %}
     <div class="col-span-2">
-        <p class="text-center text-dark-blue p-10">Tidak ada brand yang ditemukan.</p>
+        <p class="text-center text-dark-blue p-10"> No brand found.</p>
     </div>
 {% endfor %}
