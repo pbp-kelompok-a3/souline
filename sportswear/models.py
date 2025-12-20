@@ -9,7 +9,7 @@ class SportswearBrand(models.Model):
     thumbnail_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="URL Brand Logo")
 
     category_tag = models.CharField(max_length=50, default='Yoga', verbose_name="Category Tag (Yoga, Pilates, etc.)")
-    average_rating = models.DecimalField(max_digits=3, decimal_places=1, default=5.0, verbose_name="Average Rating")
+    average_rating = models.DecimalField(max_digits=4, decimal_places=1, default=5.0, verbose_name="Average Rating")
 
     def __str__(self):
         return self.brand_name
