@@ -33,7 +33,6 @@ def event_detail(request, id):
     event = get_object_or_404(Event, pk=id)
     return render(request, "events/event_detail.html", {"event": event})
 
-@login_required(login_url="/login/")
 def add_event(request):
     if request.method == "POST":
         form = EventForm(request.POST, request.FILES)
