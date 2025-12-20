@@ -15,7 +15,11 @@ def is_admin(user):
 @csrf_exempt
 @require_GET
 def list_brands_api(request):
-    brands = SportswearBrand.objects.all()
+    brands = SportswearBrand.objects.prefetch_related(
+        'reviews', 
+        'posts', 
+        'posts__author'
+    ).all()
     
     # Filtering (Search and Tag)
     query = request.GET.get('q', '')
@@ -32,18 +36,18 @@ def list_brands_api(request):
     
     brands = brands.order_by('-average_rating', 'brand_name')
     
-    # Serialisasi data
+    # Serialisasi data 
     serialized_data = serialize_brand_list(brands, user=request.user)
     
     return JsonResponse(serialized_data, safe=False)
 
 @csrf_exempt
 @require_http_methods(["POST"])
-# @login_required 
+@login_required 
 def create_brand_api(request):
     
-    # if not is_admin(request.user):
-    #    return JsonResponse({'status': 'error', 'message': 'Akses Ditolak (Admin Only).'}, status=403)
+    if not is_admin(request.user):
+        return JsonResponse({'status': 'error', 'message': 'Akses Ditolak (Admin Only).'}, status=403)
     
     if not request.body:
         return JsonResponse({'status': 'error', 'message': 'Request body is empty.'}, status=400)
@@ -73,7 +77,7 @@ def create_brand_api(request):
 
 @csrf_exempt
 @require_http_methods(["PUT"]) 
-# @login_required 
+@login_required 
 def update_brand_api(request, pk):
     """Endpoint API untuk mengupdate brand (UPDATE - Method PUT)."""
         
@@ -111,12 +115,12 @@ def update_brand_api(request, pk):
 
 @csrf_exempt
 @require_http_methods(["DELETE"]) 
-# @login_required 
+@login_required 
 def delete_brand_api(request, pk):
     """Endpoint API untuk menghapus brand (DELETE - Method DELETE)."""
     
-    # if not is_admin(request.user):
-    #    return JsonResponse({'status': 'error', 'message': 'Akses Ditolak (Admin Only).'}, status=403)
+    if not is_admin(request.user):
+      return JsonResponse({'status': 'error', 'message': 'Akses Ditolak (Admin Only).'}, status=403)
     
     try:
         brand = get_object_or_404(SportswearBrand, pk=pk)
@@ -164,7 +168,7 @@ def filter_brands_ajax(request):
 
 # CRUD ADMIN (HTML/AJAX)
 
-# @login_required
+@login_required
 @require_http_methods(["GET", "POST"])
 def add_brand(request):
     # if not is_admin(request.user): ...
@@ -186,7 +190,7 @@ def add_brand(request):
         
     return render(request, 'sportswear/add_edit_brand.html', {'form': form, 'title': 'Add New Brand'})
 
-# @login_required
+@login_required
 @require_http_methods(["GET", "POST"])
 def edit_brand(request, pk):
     # if not is_admin(request.user): ...
@@ -211,11 +215,10 @@ def edit_brand(request, pk):
         
     return render(request, 'sportswear/add_edit_brand.html', {'form': form, 'title': 'Edit Brand'})
 
-# @login_required
+@login_required
 @require_POST
 def delete_brand(request, pk):
     """Fungsi Hapus Brand untuk Web Admin (Menerima Method POST)."""
-    # if not is_admin(request.user): ...
     if not is_admin(request.user):
         return JsonResponse({'status': 'error', 'message': 'Access Denied.'}, status=403) 
         
