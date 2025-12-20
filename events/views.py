@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date, timedelta
 import json
 from django.utils import timezone
