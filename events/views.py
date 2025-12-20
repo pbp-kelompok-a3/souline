@@ -33,7 +33,6 @@ def event_detail(request, id):
     event = get_object_or_404(Event, pk=id)
     return render(request, "events/event_detail.html", {"event": event})
 
-@login_required(login_url="/login/")
 def add_event(request):
     if request.method == "POST":
         form = EventForm(request.POST, request.FILES)
@@ -133,3 +132,38 @@ def delete_event(request, id):
 
     event.delete()
     return redirect("events:event_list")
+
+@csrf_exempt
+def add_event_api(request):
+    if request.method != "POST":
+        return HttpResponseBadRequest("POST required")
+    form = EventForm(request.POST, request.FILES)
+    if form.is_valid():
+        event = form.save()
+        return JsonResponse({"id": event.id, "status": "success"})
+    return JsonResponse({"status": "failed", "errors": form.errors}, status=400)
+
+@csrf_exempt
+def edit_event_api(request, id):
+    if request.method != "POST":
+        return HttpResponseBadRequest("POST required")
+    try:
+        event = Event.objects.get(id=id)
+    except Event.DoesNotExist:
+        return JsonResponse({"status": "failed", "error": "Not found"}, status=404)
+    form = EventForm(request.POST, request.FILES, instance=event)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "failed", "errors": form.errors}, status=400)
+
+@csrf_exempt
+def delete_event_api(request, id):
+    if request.method != "POST":
+        return HttpResponseBadRequest("POST required")
+    try:
+        event = Event.objects.get(id=id)
+        event.delete()
+        return JsonResponse({"status": "success"})
+    except Event.DoesNotExist:
+        return JsonResponse({"status": "failed", "error": "Not found"}, status=404)
