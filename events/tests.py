@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from datetime import datetime, date, timedelta
 from .models import Event
 
-
 class EventViewsTest(TestCase):
     def setUp(self):
         self.client = Client()

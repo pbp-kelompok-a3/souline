@@ -24,6 +24,13 @@
     <!-- Description -->
       <h2 class="text-2xl font-semibold text-[#2E4057] mb-4">Description</h2>
       <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ event.description }}</p>
+      {% if event.location %}
+        <p class="text-gray-700 mt-2"><strong>Location:</strong>
+          <a href="{% url 'studio:show_studio' %}#studio-{{ event.location.id }}" class="text-[#F48C06] hover:underline">
+            {{ event.location.nama_studio }}
+          </a>
+        </p>
+      {% endif %}
 
     <!-- Buttons -->
     <div class="flex justify-end mt-10 space-x-4">
@@ -52,6 +59,72 @@
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 </style>
+
+<script>
+(function() {
+  const input = document.getElementById('locationInput');
+  const dropdown = document.getElementById('locationDropdown');
+  const locationIdInput = document.getElementById('locationId');
+  let timeout = null;
+
+  if (!input) return;
+
+  input.addEventListener('input', function() {
+    const query = this.value.trim();
+
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      if (!query) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+
+      fetch(`/events/studio-autocomplete/?search=${encodeURIComponent(query)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        })
+        .then(data => {
+          dropdown.innerHTML = '';
+          if (!Array.isArray(data) || data.length === 0) {
+            dropdown.classList.add('hidden');
+            return;
+          }
+
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'px-3 py-2 cursor-pointer hover:bg-gray-100';
+            li.textContent = item.nama_studio;
+            li.dataset.id = item.id;
+            li.addEventListener('click', () => {
+              input.value = item.nama_studio;
+              locationIdInput.value = item.id;
+              dropdown.classList.add('hidden');
+              input.focus();
+            });
+            dropdown.appendChild(li);
+          });
+
+          dropdown.classList.remove('hidden');
+        })
+        .catch(err => {
+          console.error('Autocomplete error:', err);
+          dropdown.classList.add('hidden');
+        });
+    }, 250);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== input) {
+      dropdown.classList.add('hidden');
+    }
+  });
+
+  input.addEventListener('keydown', () => {
+    locationIdInput.value = '';
+  });
+})();
+</script>
 
 {% include "footer.html" %}
 {% endblock %}

@@ -13,25 +13,29 @@
       <p class="text-[#F48C06] mt-2 text-lg font-medium">Take a moment to feel your flow</p>
     </div>
 
-    <!-- Filter dropdown -->
-    <div class="relative mt-6 md:mt-0">
+    <!-- Filter dropdowns -->
+    <div class="flex flex-wrap gap-3 mt-6 md:mt-0">
       <select id="filter-select"
         class="appearance-none border border-[#F48C06]/30 bg-white rounded-full px-8 py-3 text-gray-400 text-left font-medium focus:ring-2 focus:ring-[#F48C06] focus:outline-none shadow-sm transition hover:shadow-md cursor-pointer">
         <option value="">All Upcoming Events</option>
         <option value="soon">Upcoming Soon (within 7 days)</option>
         <option value="later">Coming Later (after 7 days)</option>
       </select>
-      
-      <svg class="w-5 h-5 text-[#F48C06] absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
-        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M19 9l-7 7-7-7" />
-      </svg>
+
+      <select id="filter-kota"
+        class="appearance-none border border-[#F48C06]/30 bg-white rounded-full px-8 py-3 text-gray-400 text-left font-medium focus:ring-2 focus:ring-[#F48C06] focus:outline-none shadow-sm transition hover:shadow-md cursor-pointer">
+        <option value="">All Areas</option>
+        <option value="Jakarta">Jakarta</option>
+        <option value="Bogor">Bogor</option>
+        <option value="Depok">Depok</option>
+        <option value="Tangerang">Tangerang</option>
+        <option value="Bekasi">Bekasi</option>
+      </select>
     </div>
   </div>
 
   <!-- Events container -->
-  <div id="events-container" class="event-wrapper max-w-6xl justify-start md:justify-center">
+  <div id="events-container" class="event-wrapper max-w-6xl flex flex-wrap justify-start md:justify-center gap-6">
     {% if events %}
       {% for event in events %}
         <div class="event-card w-80 p-6 flex flex-col items-center text-center bg-white shadow-md rounded-2xl mb-8">
@@ -45,11 +49,19 @@
 
           <h2 class="font-semibold text-xl text-[#2E4057]">{{ event.name }}</h2>
           <p class="event-date mt-1 text-gray-500">{{ event.date|date:"d F Y" }}</p>
+          <p class="text-gray-500 mt-1 text-sm">
+            {% if event.location %}
+              Location:
+              <a href="{% url 'studio:show_studio' %}#studio-{{ event.location.id }}" class="text-[#F48C06] hover:underline">
+                {{ event.location.nama_studio }}
+              </a>
+            {% endif %}
+          </p>
           <p class="text-gray-600 mt-3 text-sm text-center">{{ event.description|truncatechars:100 }}</p>
-            <a href="{% url 'events:event_detail' event.id %}" 
-              class="mt-4 inline-block bg-[#F48C06] text-white px-4 py-2 rounded-lg hover:bg-[#d97706]">
-              Details
-            </a>
+          <a href="{% url 'events:event_detail' event.id %}" 
+             class="mt-4 inline-block bg-[#F48C06] text-white px-4 py-2 rounded-lg hover:bg-[#d97706]">
+            Details
+          </a>
 
           {% if user == event.owner %}
           <div class="flex justify-center space-x-3 mt-4">
@@ -58,7 +70,6 @@
               {% csrf_token %}
               <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Delete</button>
             </form>
-
           </div>
           {% endif %}
         </div>
@@ -78,37 +89,71 @@
   {% endif %}
 </div>
 
-<!-- AJAX -->
+<!-- AJAX Filtering -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const select = document.getElementById('filter-select');
+  const kotaSelect = document.getElementById('filter-kota');
   const container = document.getElementById('events-container');
 
-  select.addEventListener('change', function() {
-    const filterType = this.value;
-    fetch(`/events/json/${filterType || ''}`)
-      .then(response => response.json())
-      .then(data => {
-        container.innerHTML = '';
+  function formatDate(dateStr) {
+    const options = { day: '2-digit', month: 'long', year: 'numeric' };
+    const dateObj = new Date(dateStr);
+    return dateObj.toLocaleDateString('en-GB', options);
+  }
 
-        if (data.length === 0) {
-          container.innerHTML = '<p class="text-gray-500 italic text-center w-full">No upcoming events found.</p>';
-          return;
-        }
+  function renderEvents(data) {
+    container.innerHTML = '';
+    if (!data || data.length === 0) {
+      container.innerHTML = '<p class="text-gray-500 italic text-center w-full">No upcoming events found.</p>';
+      return;
+    }
 
-        data.forEach(event => {
-          const card = `
-            <div class="event-card w-80 p-6 flex flex-col items-center text-center bg-white shadow-md rounded-2xl mb-8">
-              ${event.poster ? `<img src="${event.poster}" class="rounded-t-xl w-full h-48 object-cover mb-4">`
-                              : `<div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400 mb-4">No Image</div>`}
-              <h2 class="font-semibold text-xl text-[#2E4057]">${event.name}</h2>
-              <p class="event-date mt-1 text-gray-500">${event.date}</p>
-              <p class="text-gray-600 mt-3 text-sm text-center">${event.description}</p>
-            </div>`;
-          container.insertAdjacentHTML('beforeend', card);
-        });
-      });
-  });
+    data.forEach(event => {
+      const locationLink = event.location_id ? `/studio/#studio-${event.location_id}` : '#';
+      const locationHtml = event.location ? `<p class="text-gray-500 mt-1 text-sm">Location: <a href="${locationLink}" class="text-[#F48C06] hover:underline">${event.location}</a></p>` : '';
+
+      const posterHtml = event.poster ? 
+        `<img src="${event.poster}" class="rounded-t-xl w-full h-48 object-cover mb-4">` :
+        `<div class="h-48 flex items-center justify-center bg-gray-100 text-gray-400 mb-4">No Image</div>`;
+
+      const ownerControls = event.owner === "{{ user.username }}" ? `
+        <div class="flex justify-center space-x-3 mt-4">
+          <a href="/events/${event.id}/edit/" class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600">Edit</a>
+          <form action="/events/${event.id}/delete/" method="POST" onsubmit="return confirm('Yakin mau hapus event ini?');">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Delete</button>
+          </form>
+        </div>` : '';
+
+      const card = `
+        <div class="event-card w-80 p-6 flex flex-col items-center text-center bg-white shadow-md rounded-2xl mb-8">
+          ${posterHtml}
+          <h2 class="font-semibold text-xl text-[#2E4057]">${event.name}</h2>
+          <p class="event-date mt-1 text-gray-500">${formatDate(event.date)}</p>
+          ${locationHtml}
+          <p class="text-gray-600 mt-3 text-sm text-center">${event.description}</p>
+          <a href="/events/${event.id}/" class="mt-4 inline-block bg-[#F48C06] text-white px-4 py-2 rounded-lg hover:bg-[#d97706]">Details</a>
+          ${ownerControls}
+        </div>`;
+      container.insertAdjacentHTML('beforeend', card);
+    });
+  }
+
+  function fetchEvents() {
+    const filterType = select.value;
+    const kota = kotaSelect.value;
+    const params = new URLSearchParams();
+    if (filterType) params.append('filter', filterType);
+    if (kota) params.append('kota', kota);
+
+    fetch(`/events/json/?${params.toString()}`)
+      .then(r => r.json())
+      .then(data => renderEvents(data));
+  }
+
+  select.addEventListener('change', fetchEvents);
+  kotaSelect.addEventListener('change', fetchEvents);
 });
 </script>
 

@@ -1,98 +1,30 @@
 import csv
-import time
-import googlemaps
-import requests
-import os
 from django.core.management.base import BaseCommand
-from django.conf import settings
-from django.core.files.base import ContentFile
 from studio.models import Studio
-from pathlib import Path
-
 
 class Command(BaseCommand):
-    help = 'Import or update studios from CSV file'
+    help = 'Import studios from CSV'
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '--clear',
-            action='store_true',
-            help='Clear all existing studios before importing',
-        )
-        parser.add_argument(
-            '--update',
-            action='store_true',
-            help='Update existing studios with new data from CSV',
-        )
-        parser.add_argument(
-            '--update-images',
-            action='store_true',
-            help='Update images for all existing studios',
-        )
+        parser.add_argument('csv_file', type=str, help='Path to CSV file')
 
     def handle(self, *args, **options):
-        # Initialize Google Maps client
-        api_key = settings.GMAPS_API_KEY
-        if not api_key:
-            self.stdout.write(self.style.ERROR('Google Maps API key not found in settings'))
-            return
-        
-        gmaps = googlemaps.Client(key=api_key)
-        
-        if options['update_images']:
-            self.stdout.write('Updating images for all studios...')
-            studios = Studio.objects.all()
-            count = studios.count()
-            
-            for i, studio in enumerate(studios, 1):
-                self.stdout.write(f'Processing {i}/{count}: {studio.nama_studio}')
-                
-                # Clear thumbnail
-                studio.thumbnail = None
-                
-                try:
-                    thumbnail_url, _, rating = self.fetch_place_data(
-                        gmaps, api_key, studio.nama_studio, studio.kota, studio.area
+        csv_file = options['csv_file']
+        with open(csv_file, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                nama_studio = row['Nama Studio']
+                kota = row['Wilayah Utama']
+                area = row['Area Spesifik']
+                if kota in ['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi']:
+                    Studio.objects.get_or_create(
+                        nama_studio=nama_studio,
+                        defaults={'kota': kota, 'area': area}
                     )
-                    studio.thumbnail = thumbnail_url
-                    studio.rating = rating
-                    studio.save()
-                    time.sleep(1)  # Rate limiting
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(f'Error updating {studio.nama_studio}: {str(e)}'))
-            
-            self.stdout.write(self.style.SUCCESS('Finished updating all studio images.'))
-            return
-
-        # Path to CSV file
-        csv_file = Path(__file__).resolve().parent.parent.parent.parent / 'DataSet - List Pilates _ Yoga Studio Jabodetabek (1).csv'
-        
-        if not csv_file.exists():
-            self.stdout.write(self.style.ERROR(f'CSV file not found: {csv_file}'))
-            return
-
-        # Clear existing studios if --clear flag is used
-        if options['clear']:
-            Studio.objects.all().delete()
-            self.stdout.write(self.style.WARNING('All existing studios have been deleted.'))
-
-        # City mapping from CSV values to database values
-        city_mapping = {
-            'Bekasi': 'Bekasi',
-            'Bogor': 'Bogor',
-            'Depok': 'Depok',
-            'Tangerang': 'Tangerang',
-            'Jakarta': 'Jakarta',
-            'Jakarta Barat': 'Jakarta',
-            'Jakarta Pusat': 'Jakarta',
-            'Jakarta Selatan': 'Jakarta',
-            'Jakarta Timur': 'Jakarta',
-            'Jakarta Utara': 'Jakarta',
-        }
-
-        imported_count = 0
-        updated_count = 0
-        skipped_count = 0
+                    self.stdout.write(self.style.SUCCESS(f'Imported {nama_studio}'))
+                else:
+                    self.stdout.write(self.style.WARNING(f'Skipped {nama_studio} - invalid kota'))
+        self.stdout.write(self.style.SUCCESS('Import completed'))
         
         with open(csv_file, 'r', encoding='utf-8') as file:
             # Skip the first two lines (header rows)
