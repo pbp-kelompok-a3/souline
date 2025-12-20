@@ -29,6 +29,7 @@ urlpatterns = [
     path('sportswear/', include('sportswear.urls')),
     path('auth/', include('authentication.urls')),
     path('timeline/', include('timeline.urls')),
+    path('bookmarks/', include('bookmarks.urls')),
 ]
 
 if settings.DEBUG:
