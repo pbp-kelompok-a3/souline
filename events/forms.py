@@ -1,7 +1,21 @@
 from django import forms
 from .models import Event
+from studio.models import Studio
 
 class EventForm(forms.ModelForm):
+    location = forms.ModelChoiceField(
+        queryset=Studio.objects.none(),  # set in __init__
+        empty_label="Select Location",
+        widget=forms.Select(),
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['location'].queryset = Studio.objects.all()
+        if self.instance and self.instance.location:
+            self.fields['location'].initial = self.instance.location
+
     class Meta:
         model = Event
         fields = ['poster', 'name', 'date', 'description', 'location']
@@ -21,11 +35,7 @@ class EventForm(forms.ModelForm):
                 'rows': 4
             }),
             'poster': forms.ClearableFileInput(attrs={
-                'class': 'hidden',  # biar ngikut style upload kotak plus tadi
+                'class': 'hidden',  
                 'accept': 'image/*'
-            }),
-            'location': forms.TextInput(attrs={
-                'placeholder': 'Enter event location',
-                'class': 'w-full rounded-md border border-gray-300 px-3 py-2 mt-1 text-gray-700 focus:ring-2 focus:ring-[#F48C06] focus:outline-none'
             }),
         }
