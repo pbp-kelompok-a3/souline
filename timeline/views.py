@@ -9,6 +9,9 @@ from django.template.loader import render_to_string
 from .forms import PostForm, CommentForm
 from .models import Post, Comment, Resource, SportswearBrand
 
+def is_admin(user):
+    return user.is_superuser or user.is_staff
+
 def timeline_list(request):
     posts_qs = Post.objects.select_related('author').prefetch_related('likes', 'comments__author').all().order_by('created_at')
     paginator = Paginator(posts_qs, 10)
@@ -216,6 +219,44 @@ def create_post_api(request):
 @csrf_exempt
 @login_required
 @require_POST
+def edit_post_api(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if post.author != request.user and not is_admin(request.user):
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    try:
+        data = json.loads(request.body)
+        text = data.get('text')
+
+        if not text:
+            return JsonResponse({'status': 'error', 'message': 'Text cannot be empty'}, status=400)
+
+        post.text = text
+        post.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Post updated successfully'})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+
+@csrf_exempt
+@login_required
+@require_POST
+def delete_post_api(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if post.author != request.user and not is_admin(request.user):
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    post.delete()
+
+    return JsonResponse({'status': 'success', 'message': 'Post deleted successfully'})
+
+@csrf_exempt
+@login_required
+@require_POST
 def toggle_like_api(request, pk):
     post = get_object_or_404(Post, pk=pk)
     user = request.user
@@ -240,14 +281,24 @@ def add_comment_api(request, pk):
         content = data.get('content') or data.get('text')
 
         if not content:
-            return JsonResponse({'status': 'error', 'message': 'Comment content cannot be empty'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Content cannot be empty'}, status=400)
 
         comment = Comment.objects.create(
             post=post,
             author=request.user,
             text=content
         )
-        return JsonResponse({'status': 'success', 'message': 'Comment added'})
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Comment added',
+            'data': {
+                'id': comment.id,
+                'author_username': comment.author.username,
+                'content': comment.text,
+                'created_at': comment.created_at.isoformat() if hasattr(comment, 'created_at') else None,
+            }
+        })
         
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
@@ -258,7 +309,7 @@ def add_comment_api(request, pk):
 def edit_comment_api(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
 
-    if comment.author != request.user:
+    if comment.author != request.user and not is_admin(request.user):
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
 
     try:
@@ -283,7 +334,7 @@ def edit_comment_api(request, pk):
 def delete_comment_api(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
 
-    if comment.author != request.user:
+    if comment.author != request.user and not is_admin(request.user):
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
 
     comment.delete()
