@@ -32,7 +32,7 @@
       <span class="like-count">{{ post.like_count }}</span>
     </button>
 
-    {% if user == post.author %}
+    {% if user == post.author or user.is_superuser or user.is_staff %}
       <button class="edit-btn text-[#446178] hover:text-[#FFA04D]" data-post-id="{{ post.pk }}">
         ✏️ Edit
       </button>
