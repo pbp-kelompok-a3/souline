@@ -1,4 +1,5 @@
-import json
+import json, base64
+from django.core.files.base import ContentFile
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -147,6 +148,7 @@ def timeline_json(request):
                 "id": p.resource.id,
                 "name": p.resource.title,
                 "thumbnail": p.resource.thumbnail_url if p.resource.thumbnail_url else "",
+                "link": p.resource.youtube_url if p.resource.youtube_url else "",
             }
         elif p.sportswear: 
             attachment_data = {
@@ -154,6 +156,7 @@ def timeline_json(request):
                 "id": p.sportswear.id,
                 "name": p.sportswear.brand_name,
                 "thumbnail": p.sportswear.thumbnail_url if p.sportswear.thumbnail_url else "",
+                "link": p.sportswear.link if p.sportswear.link else "",
             }
 
         is_liked = False
@@ -171,6 +174,7 @@ def timeline_json(request):
             'comments': comments_list,
             'created_at': p.created_at.isoformat(),
             'attachment': attachment_data, 
+            'is_owner': request.user == p.author or request.user.is_superuser or request.user.is_staff,
         })
 
     return JsonResponse({
@@ -191,6 +195,21 @@ def create_post_api(request):
             author=request.user,
             text=text or ''
         )
+
+        image_data = data.get('image')
+        if image_data:
+            try:
+                format, imgstr = None, image_data
+                if ';base64,' in image_data:
+                    format, imgstr = image_data.split(';base64,')
+                
+                ext = format.split('/')[-1] if format else 'jpg'
+
+                data_file = ContentFile(base64.b64decode(imgstr), name=f'{post.id}_image.{ext}')
+                
+                post.image.save(data_file.name, data_file)
+            except Exception as e:
+                print(f"Error saving image: {e}")
 
         attachment = data.get('attachment')
         if attachment:
