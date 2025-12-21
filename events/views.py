@@ -136,23 +136,22 @@ def delete_event(request, id):
     return redirect("events:event_list")
 
 @csrf_exempt
+@login_required
 def add_event_api(request):
-    if request.method != "POST":
-        return HttpResponseBadRequest("POST required")
     form = EventForm(request.POST, request.FILES)
     if form.is_valid():
-        event = form.save()
-        return JsonResponse({"id": event.id, "status": "success"})
-    return JsonResponse({"status": "failed", "errors": form.errors}, status=400)
+        event = form.save(commit=False)
+        event.owner = request.user
+        event.save()
+        return JsonResponse({"status": "success"})
 
 @csrf_exempt
+@login_required
 def edit_event_api(request, id):
-    if request.method != "POST":
-        return HttpResponseBadRequest("POST required")
-    try:
-        event = Event.objects.get(id=id)
-    except Event.DoesNotExist:
-        return JsonResponse({"status": "failed", "error": "Not found"}, status=404)
+    event = get_object_or_404(Event, id=id)
+    if not (request.user.is_staff or (event.owner and event.owner == request.user)):
+        return JsonResponse({"status": "failed", "error": "Forbidden"}, status=403)
+
     form = EventForm(request.POST, request.FILES, instance=event)
     if form.is_valid():
         form.save()
@@ -160,12 +159,10 @@ def edit_event_api(request, id):
     return JsonResponse({"status": "failed", "errors": form.errors}, status=400)
 
 @csrf_exempt
+@login_required
 def delete_event_api(request, id):
-    if request.method != "POST":
-        return HttpResponseBadRequest("POST required")
-    try:
-        event = Event.objects.get(id=id)
-        event.delete()
-        return JsonResponse({"status": "success"})
-    except Event.DoesNotExist:
-        return JsonResponse({"status": "failed", "error": "Not found"}, status=404)
+    event = get_object_or_404(Event, id=id)
+    if not (request.user.is_staff or event.owner == request.user):
+        return JsonResponse({"error": "Forbidden"}, status=403)
+    event.delete()
+    return JsonResponse({"status": "success"})
