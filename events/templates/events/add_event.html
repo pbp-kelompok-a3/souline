@@ -9,8 +9,8 @@
     <p class="text-[#F48C06] mb-8">Take a moment to feel your flow</p>
 
     <!-- FORM -->
-    <form id="eventForm" method="POST" enctype="multipart/form-data" 
-          class="bg-[#FFF3D9] rounded-2xl p-8 shadow-md flex flex-col md:flex-row gap-8 justify-center items-center">
+    <form id="eventForm" method="POST"
+      class="bg-[#FFF3D9] rounded-2xl p-8 shadow-md flex flex-col md:flex-row gap-8 justify-center items-center">
       {% csrf_token %}
       {% if form.errors %}
         <div class="w-full text-red-500">
@@ -19,11 +19,8 @@
       {% endif %}
 
       <!-- Poster upload -->
-      <div class="flex flex-col justify-center items-center bg-white w-64 h-64 rounded-xl shadow-inner cursor-pointer relative border-2 border-dashed border-gray-300 hover:border-[#F48C06] transition">
-        <label for="id_poster" class="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-          <span class="text-3xl text-gray-400">＋</span>
-          <span class="text-sm text-gray-400 mt-2">Upload Poster</span>
-        </label>
+      <div>
+        <label class="text-gray-600 text-sm font-semibold">Poster URL</label>
         {{ form.poster }}
       </div>
 

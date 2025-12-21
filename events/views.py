@@ -96,7 +96,7 @@ def events_json(request):
             "name": e.name,
             "date": e.date.isoformat(),
             "description": e.description,
-            "poster": request.build_absolute_uri(e.poster.url) if e.poster else "",
+            "poster": e.poster or "",
             "location": e.location.nama_studio if e.location else "",
             "location_id": str(e.location.id) if e.location else "",
             "location_kota": e.location.kota if e.location else "",
