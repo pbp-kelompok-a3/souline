@@ -77,26 +77,27 @@ def post_detail(request, pk):
 @require_POST
 def edit_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    if post.author != request.user:
+    if post.author == request.user or is_admin(request.user):
+        text = request.POST.get('text', '').strip()
+        if not text:
+            return JsonResponse({'success': False, 'error': 'empty_text'}, status=400)
+
+        post.text = text
+        post.save()
+        html = render_to_string('_post.html', {'post': post, 'user': request.user}, request=request)
+        return JsonResponse({'success': True, 'html': html})
+    else:
         return JsonResponse({'success': False, 'error': 'permission_denied'}, status=403)
-
-    text = request.POST.get('text', '').strip()
-    if not text:
-        return JsonResponse({'success': False, 'error': 'empty_text'}, status=400)
-
-    post.text = text
-    post.save()
-    html = render_to_string('_post.html', {'post': post, 'user': request.user}, request=request)
-    return JsonResponse({'success': True, 'html': html})
 
 @login_required
 @require_POST
 def delete_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    if post.author != request.user:
+    if post.author == request.user or is_admin(request.user):    
+        post.delete()
+        return JsonResponse({'success': True})
+    else:
         return JsonResponse({'success': False, 'error': 'permission_denied'}, status=403)
-    post.delete()
-    return JsonResponse({'success': True})
 
 def show_json(request):
     posts = Post.objects.all().order_by('-created_at')
@@ -146,15 +147,13 @@ def timeline_json(request):
                 "id": p.resource.id,
                 "name": p.resource.title,
                 "thumbnail": p.resource.thumbnail_url if p.resource.thumbnail_url else "",
-                "link": p.resource.link if hasattr(p.resource, 'link') else ""
             }
         elif p.sportswear: 
             attachment_data = {
                 "type": "Sportswear",
                 "id": p.sportswear.id,
-                "name": p.sportswear.title,
+                "name": p.sportswear.brand_name,
                 "thumbnail": p.sportswear.thumbnail_url if p.sportswear.thumbnail_url else "",
-                "link": p.sportswear.link if hasattr(p.sportswear, 'link') else ""
             }
 
         is_liked = False
@@ -195,7 +194,7 @@ def create_post_api(request):
 
         attachment = data.get('attachment')
         if attachment:
-            atype = attachment.get('type') or attachment.get('tag')
+            atype = attachment.get('type')
             aid = attachment.get('id')
             if not aid and 'data' in attachment:
                 aid = attachment['data'].get('id')
@@ -222,24 +221,23 @@ def create_post_api(request):
 def edit_post_api(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
-    if post.author != request.user and not is_admin(request.user):
+    if post.author == request.user or is_admin(request.user):
+        try:
+            data = json.loads(request.body)
+            text = data.get('text')
+
+            if not text:
+                return JsonResponse({'status': 'error', 'message': 'Text cannot be empty'}, status=400)
+
+            post.text = text
+            post.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Post updated successfully'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    else:
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
-
-    try:
-        data = json.loads(request.body)
-        text = data.get('text')
-
-        if not text:
-            return JsonResponse({'status': 'error', 'message': 'Text cannot be empty'}, status=400)
-
-        post.text = text
-        post.save()
-
-        return JsonResponse({'status': 'success', 'message': 'Post updated successfully'})
-
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
 
 @csrf_exempt
 @login_required
@@ -247,12 +245,11 @@ def edit_post_api(request, pk):
 def delete_post_api(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
-    if post.author != request.user and not is_admin(request.user):
+    if post.author == request.user or is_admin(request.user):
+        post.delete()
+        return JsonResponse({'status': 'success', 'message': 'Post deleted successfully'})
+    else:
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
-
-    post.delete()
-
-    return JsonResponse({'status': 'success', 'message': 'Post deleted successfully'})
 
 @csrf_exempt
 @login_required
@@ -309,24 +306,23 @@ def add_comment_api(request, pk):
 def edit_comment_api(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
 
-    if comment.author != request.user and not is_admin(request.user):
+    if comment.author == request.user or is_admin(request.user):
+        try:
+            data = json.loads(request.body)
+            content = data.get('content') or data.get('text')
+
+            if not content:
+                return JsonResponse({'status': 'error', 'message': 'Comment content cannot be empty'}, status=400)
+
+            comment.text = content
+            comment.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Comment updated successfully'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    else:
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
-
-    try:
-        data = json.loads(request.body)
-        content = data.get('content') or data.get('text')
-
-        if not content:
-            return JsonResponse({'status': 'error', 'message': 'Comment content cannot be empty'}, status=400)
-
-        comment.text = content
-        comment.save()
-
-        return JsonResponse({'status': 'success', 'message': 'Comment updated successfully'})
-
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
 
 @csrf_exempt
 @login_required
@@ -334,9 +330,8 @@ def edit_comment_api(request, pk):
 def delete_comment_api(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
 
-    if comment.author != request.user and not is_admin(request.user):
+    if comment.author == request.user or is_admin(request.user):
+        comment.delete()
+        return JsonResponse({'status': 'success', 'message': 'Comment deleted successfully'})
+    else:
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
-
-    comment.delete()
-
-    return JsonResponse({'status': 'success', 'message': 'Comment deleted successfully'})

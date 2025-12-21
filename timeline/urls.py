@@ -15,6 +15,7 @@ urlpatterns = [
 
 
     path('api/timeline/', views.timeline_json, name='api_timeline'),
+    path('is-admin', views.is_admin, name='is_admin'),
     path('api/create_post/', views.create_post_api, name='create_post_api'),
     path('api/post/<int:pk>/edit/', views.edit_post_api, name='edit_post_api'),
     path('api/post/<int:pk>/delete/', views.delete_post_api, name='delete_post_api'),    
