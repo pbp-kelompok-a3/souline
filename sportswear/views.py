@@ -15,7 +15,20 @@ def is_admin(user):
 
 @csrf_exempt 
 def list_brands_api(request):
+    tag = request.GET.get('tag')
+    query = request.GET.get('q')
+
     brands = SportswearBrand.objects.all().order_by('brand_name')
+
+    if tag and tag.strip() and tag.lower() != 'all' and tag != 'null':
+        brands = brands.filter(category_tag__iexact=tag)
+
+    if query and query.strip():
+        brands = brands.filter(
+            Q(brand_name__icontains=query) | 
+            Q(description__icontains=query)
+        )
+
     data = serialize_brand_list(brands, user=request.user) 
     return JsonResponse(data, safe=False)
 
