@@ -34,7 +34,7 @@ def event_detail(request, id):
     event = get_object_or_404(Event, pk=id)
     return render(request, "events/event_detail.html", {"event": event})
 
-@login_required(login_url="/login/")
+@login_required(login_url='/users/login/')
 def add_event(request):
     if request.method == "POST":
         form = EventForm(request.POST, request.FILES)
@@ -105,7 +105,7 @@ def events_json(request):
 
     return JsonResponse(data, safe=False)
 
-@login_required(login_url="/login/")
+@login_required(login_url='/users/login/')
 def edit_event(request, id):
     event = get_object_or_404(Event, id=id)
 
@@ -122,7 +122,7 @@ def edit_event(request, id):
         form = EventForm(instance=event)
     return render(request, "events/edit_event.html", {"form": form, "event": event})
 
-@login_required(login_url="/login/")
+@login_required(login_url='/users/login/')
 def delete_event(request, id):
     event = get_object_or_404(Event, id=id)
 
@@ -136,7 +136,7 @@ def delete_event(request, id):
     return redirect("events:event_list")
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/users/login/')
 def add_event_api(request):
     form = EventForm(request.POST, request.FILES)
     if form.is_valid():
@@ -146,7 +146,7 @@ def add_event_api(request):
         return JsonResponse({"status": "success"})
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/users/login/')
 def edit_event_api(request, id):
     event = get_object_or_404(Event, id=id)
     if not (request.user.is_staff or (event.owner and event.owner == request.user)):
@@ -159,7 +159,7 @@ def edit_event_api(request, id):
     return JsonResponse({"status": "failed", "errors": form.errors}, status=400)
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/users/login/')
 def delete_event_api(request, id):
     event = get_object_or_404(Event, id=id)
     if not (request.user.is_staff or event.owner == request.user):
