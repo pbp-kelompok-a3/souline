@@ -354,3 +354,18 @@ def delete_comment_api(request, pk):
         return JsonResponse({'status': 'success', 'message': 'Comment deleted successfully'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+    
+def get_post_comments(request, post_id):
+    comments = Comment.objects.filter(post_id=post_id).order_by('-created_at')
+    
+    data = [
+        {
+            'id': c.id,
+            'author_username': c.author.username,
+            'content': c.text,
+            'created_at': c.created_at.isoformat(),
+        }
+        for c in comments
+    ]
+    
+    return JsonResponse(data, safe=False)
