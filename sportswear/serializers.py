@@ -39,9 +39,6 @@ def serialize_brand_detail(brand, user=None):
         'link': brand.link,
         'reviews': all_reviews, 
     }
-
-    if user and user.is_authenticated and user.is_staff:
-        data['admin_notes'] = brand.admin_notes
     
     return data
 
