@@ -8,7 +8,7 @@ from .models import Bookmark
 import json
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/users/login/')
 @require_http_methods(["GET"])
 def get_bookmarks(request):
     bookmarks = Bookmark.objects.filter(user=request.user)
@@ -23,11 +23,9 @@ def get_bookmarks(request):
                 'object_id': bookmark.object_id,
                 'created_at': bookmark.created_at.isoformat(),
             }
-            # Try to add a string representation or specific fields if possible
+
             try:
                 item['title'] = str(bookmark.content_object)
-                # You might want to customize this based on the model if needed
-                # e.g., if model == 'studio', item['image'] = bookmark.content_object.thumbnail
             except:
                 item['title'] = "Unknown Object"
                 
@@ -36,7 +34,7 @@ def get_bookmarks(request):
     return JsonResponse({'status': 'success', 'bookmarks': data})
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/users/login/')
 @require_http_methods(["POST"])
 def add_bookmark(request):
     try:
@@ -53,7 +51,7 @@ def add_bookmark(request):
         except ContentType.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Invalid content type'}, status=400)
 
-        # Check if object exists (optional, but good practice)
+        # Check if object exists
         model_class = content_type.model_class()
         if not model_class.objects.filter(pk=object_id).exists():
              return JsonResponse({'status': 'error', 'message': 'Object not found'}, status=404)
@@ -77,18 +75,9 @@ def add_bookmark(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/users/login/')
 @require_http_methods(["POST", "DELETE"])
 def remove_bookmark(request, bookmark_id=None):
-    # Support both removing by ID in URL (typical REST) 
-    # and removing by payload (referencing object) if needed.
-    # Here implementing removal by bookmark_id for simplicity 
-    # or by object details if bookmark_id not provided in URL?
-    # Let's stick to simple URL param for delete usually, but user might send object details.
-    
-    # If using POST for everything (often easier in some mobile contexts if not strict REST),
-    # let's parse body if bookmark_id is not in args.
-    
     if bookmark_id:
         try:
             bookmark = Bookmark.objects.get(pk=bookmark_id, user=request.user)
@@ -97,8 +86,6 @@ def remove_bookmark(request, bookmark_id=None):
         except Bookmark.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Bookmark not found'}, status=404)
             
-    # If no ID provided, maybe they sent the object details to remove?
-    # Let's handle parsing body for removal by object params
     try:
         data = json.loads(request.body)
         app_label = data.get('app_label')
