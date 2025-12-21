@@ -141,13 +141,50 @@ def add_event_api(request):
     if not request.user.is_authenticated:
         return JsonResponse({"status": "error", "message": "Unauthorized"}, status=401)
     
-    form = EventForm(request.POST, request.FILES)
-    if form.is_valid():
-        event = form.save(commit=False)
-        event.owner = request.user
-        event.save()
-        return JsonResponse({"status": "success"})
-    return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+    
+    # Validate required fields
+    name = data.get('name')
+    date_str = data.get('date')
+    description = data.get('description')
+    location_name = data.get('location')
+    poster = data.get('poster', '')  # URL string (optional)
+    
+    if not all([name, date_str, description]):
+        return JsonResponse({"status": "error", "message": "Missing required fields: name, date, description"}, status=400)
+    
+    # Parse date
+    try:
+        from datetime import datetime
+        event_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({"status": "error", "message": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+    
+    # Get location (Studio)
+    location = None
+    if location_name:
+        location = Studio.objects.filter(nama_studio__iexact=location_name).first()
+        if not location:
+            return JsonResponse({"status": "error", "message": "Location (Studio) not found"}, status=404)
+    
+    # Create the event
+    event = Event.objects.create(
+        name=name,
+        date=event_date,
+        description=description,
+        location=location,
+        poster=poster if poster else None,
+        owner=request.user
+    )
+    
+    return JsonResponse({
+        "status": "success",
+        "message": "Event created",
+        "event_id": event.id
+    })
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -159,11 +196,36 @@ def edit_event_api(request, id):
     if not (request.user.is_staff or (event.owner and event.owner == request.user)):
         return JsonResponse({"status": "error", "message": "Forbidden"}, status=403)
 
-    form = EventForm(request.POST, request.FILES, instance=event)
-    if form.is_valid():
-        form.save()
-        return JsonResponse({"status": "success"})
-    return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+    
+    # Update fields if provided
+    if 'name' in data:
+        event.name = data['name']
+    if 'date' in data:
+        try:
+            from datetime import datetime
+            event.date = datetime.strptime(data['date'], "%Y-%m-%d").date()
+        except ValueError:
+            return JsonResponse({"status": "error", "message": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+    if 'description' in data:
+        event.description = data['description']
+    if 'poster' in data:
+        event.poster = data['poster'] if data['poster'] else None
+    if 'location' in data:
+        location_name = data['location']
+        if location_name:
+            location = Studio.objects.filter(nama_studio__iexact=location_name).first()
+            if not location:
+                return JsonResponse({"status": "error", "message": "Location (Studio) not found"}, status=404)
+            event.location = location
+        else:
+            event.location = None
+    
+    event.save()
+    return JsonResponse({"status": "success", "message": "Event updated"})
 
 @csrf_exempt
 @require_http_methods(["POST", "DELETE"])
