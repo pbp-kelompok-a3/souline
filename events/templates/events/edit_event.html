@@ -8,28 +8,13 @@
     <p class="text-[#F48C06] text-lg mb-8 font-medium">Take a moment to feel your flow</p>
 
     <!-- FORM -->
-    <form id="eventForm" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row gap-10">
+    <form id="eventForm" method="POST" class="flex flex-col md:flex-row gap-10">
       {% csrf_token %}
 
-      <!-- Upload Poster -->
-      <div class="flex flex-col items-center justify-center w-[300px] h-[350px] border-2 border-dashed border-gray-300 rounded-2xl hover:border-[#F48C06] transition relative bg-white">
-        {% if form.instance.poster %}
-          <img id="posterPreview" src="{{ form.instance.poster.url }}" alt="{{ form.instance.name }}"
-               class="absolute inset-0 w-full h-full object-cover rounded-2xl">
-          <button type="button"
-                  onclick="clearPoster()"
-                  class="absolute bottom-3 right-3 bg-[#F48C06] text-white px-3 py-1 rounded-md text-xs shadow hover:bg-[#d97706] transition">
-            Clear
-          </button>
-        {% else %}
-          <div id="posterPreview" class="flex flex-col items-center justify-center h-full">
-            <span class="text-3xl text-gray-400">+</span>
-            <span class="text-gray-400 mt-2">Upload Poster</span>
-          </div>
-        {% endif %}
-
-        <input type="file" name="poster" id="id_poster" accept="image/*" class="hidden" onchange="previewPoster(event)">
-        <label for="id_poster" class="absolute inset-0 cursor-pointer"></label>
+      <!-- Upload Poster URL -->
+      <div>
+        <label class="text-gray-600 text-sm font-semibold">Poster URL</label>
+        {{ form.poster }}
       </div>
 
       <!-- Event Info -->
@@ -73,19 +58,23 @@
 </div>
 
 <script>
-function previewPoster(event) {
-  const input = event.target;
+function previewPosterUrl(url) {
   const preview = document.getElementById('posterPreview');
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      preview.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'object-cover', 'rounded-2xl');
-      preview.appendChild(img);
-    };
-    reader.readAsDataURL(input.files[0]);
+  if (!url) {
+    preview.innerHTML = `<div class="flex flex-col items-center justify-center h-full">
+      <span class="text-3xl text-gray-400">+</span>
+      <span class="text-gray-400 mt-2">Poster URL</span>
+    </div>`;
+    return;
+  }
+  if (preview.tagName === 'IMG') {
+    preview.src = url;
+  } else {
+    preview.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = url;
+    img.classList.add('absolute', 'inset-0', 'w-full', 'h-full', 'object-cover', 'rounded-2xl');
+    preview.appendChild(img);
   }
 }
 
@@ -93,17 +82,17 @@ function clearPoster() {
   const preview = document.getElementById('posterPreview');
   const input = document.getElementById('id_poster');
   input.value = '';
-  preview.innerHTML = `
-    <div class="flex flex-col items-center justify-center h-full">
-      <span class="text-3xl text-gray-400">+</span>
-      <span class="text-gray-400 mt-2">Upload Poster</span>
-    </div>`;
+  preview.innerHTML = `<div class="flex flex-col items-center justify-center h-full">
+    <span class="text-3xl text-gray-400">+</span>
+    <span class="text-gray-400 mt-2">Poster URL</span>
+  </div>`;
 }
 </script>
 
 <style>
   input[type="text"],
   input[type="date"],
+  input[type="url"],
   textarea {
     width: 100%;
     border-radius: 0.75rem;
@@ -117,6 +106,7 @@ function clearPoster() {
 
   input[type="text"]:focus,
   input[type="date"]:focus,
+  input[type="url"]:focus,
   textarea:focus {
     border-color: #f48c06;
     box-shadow: 0 0 0 2px rgba(244, 140, 6, 0.25);

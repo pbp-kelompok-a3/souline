@@ -6,7 +6,7 @@ class Event(models.Model):
     name = models.CharField(max_length=120)
     description = models.TextField()
     date = models.DateField()
-    poster = models.ImageField(upload_to='event_posters/', blank=True, null=True)
+    poster = models.URLField(max_length=1000, blank=True, null=True)
     location = models.ForeignKey(
         Studio,
         on_delete=models.SET_NULL,

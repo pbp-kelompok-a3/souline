@@ -34,8 +34,8 @@ class EventForm(forms.ModelForm):
                 'class': 'w-full rounded-md border border-gray-300 px-3 py-2 mt-1 text-gray-700 focus:ring-2 focus:ring-[#F48C06] focus:outline-none',
                 'rows': 4
             }),
-            'poster': forms.ClearableFileInput(attrs={
-                'class': 'hidden',  
-                'accept': 'image/*'
+            'poster': forms.URLInput(attrs={
+                'placeholder': 'Input your URL poster here',
+                'class': 'w-full rounded-md border border-gray-300 px-3 py-2 mt-1 text-gray-700 focus:ring-2 focus:ring-[#F48C06] focus:outline-none'
             }),
         }
