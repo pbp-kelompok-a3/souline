@@ -20,107 +20,56 @@ def list_brands_api(request):
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
-@require_http_methods(["POST"])
-#@login_required 
 def create_brand_api(request):
-    
-    if not is_admin(request.user):
-        return JsonResponse({'status': 'error', 'message': 'Akses Ditolak (Admin Only).'}, status=403)
-    
-    if not request.body:
-        return JsonResponse({'status': 'error', 'message': 'Request body is empty.'}, status=400)
-    
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
-    
-    if 'name' in data:
-        data['brand_name'] = data.pop('name')
-    if 'thumbnail' in data:
-        data['thumbnail_url'] = data.pop('thumbnail')
-    if 'tag' in data:
-        data['category_tag'] = data.pop('tag')
-    if 'rating' in data:
-        data['average_rating'] = data.pop('rating')
-    
-    form = SportswearBrandForm(data)
-    
-    if form.is_valid():
-        brand = form.save()
-        return JsonResponse(serialize_brand_detail(brand, user=request.user), status=201)
-    else:
-        return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            brand = SportswearBrand.objects.create(
+                brand_name=data.get("name"),
+                description=data.get("description"),
+                category_tag=data.get("tag"),
+                thumbnail_url=data.get("thumbnail"),
+                average_rating=float(data.get("rating", 5.0)),
+                link=data.get("link") 
+            )
+            return JsonResponse({'status': 'success', 'id': brand.id}, status=201)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 @csrf_exempt
-@require_http_methods(["PUT"]) 
-#@login_required 
-def update_brand_api(request, pk):
-    """Endpoint API untuk mengupdate brand (UPDATE - Method PUT)."""
-        
-    brand = get_object_or_404(SportswearBrand, pk=pk)
-    
-    if not request.body:
-        return JsonResponse({'status': 'error', 'message': 'Request body is empty.'}, status=400)
-
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
-
-    if 'name' in data:
-        data['brand_name'] = data.pop('name')
-        
-    if 'thumbnail' in data:
-        data['thumbnail_url'] = data.pop('thumbnail')
-        
-    if 'tag' in data:
-        data['category_tag'] = data.pop('tag')
-        
-    if 'rating' in data:
-        data['average_rating'] = data.pop('rating')
-
-    form = SportswearBrandForm(data, instance=brand)
-    
-    if form.is_valid():
-        brand = form.save()
-        return JsonResponse(serialize_brand_detail(brand, user=request.user), status=200)
-    else:
-        print(form.errors) 
-        return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
-
+def update_brand_api(request): 
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            brand_id = data.get("id") 
+            brand = SportswearBrand.objects.get(pk=brand_id)
+            
+            brand.brand_name = data.get("name", brand.brand_name)
+            brand.description = data.get("description", brand.description)
+            brand.category_tag = data.get("tag", brand.category_tag)
+            brand.thumbnail_url = data.get("thumbnail", brand.thumbnail_url)
+            brand.link = data.get("link", brand.link)
+            brand.save()
+            
+            return JsonResponse({'status': 'success'}, status=200)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 @csrf_exempt
-@require_http_methods(["DELETE"]) 
-# @login_required 
-def delete_brand_api(request, pk):
-    """Endpoint API untuk menghapus brand (DELETE - Method DELETE)."""
-    
-    if not is_admin(request.user):
-      return JsonResponse({'status': 'error', 'message': 'Akses Ditolak (Admin Only).'}, status=403)
-    
-    try:
-        brand = get_object_or_404(SportswearBrand, pk=pk)
-        brand.delete()
-        
-        return JsonResponse({'status': 'success', 'message': f'Brand ID {pk} deleted successfully.'}, status=200)
-        
-    except Http404:
-        return JsonResponse({'status': 'error', 'message': f'Brand ID {pk} not found.'}, status=404)
-        
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-def show_sportswear(request):
-    brands = SportswearBrand.objects.all().order_by('brand_name')
-    for brand in brands:
-        brand.latest_reviews = brand.reviews.select_related('reviewer').all()[:3]
-        
-    context = {
-        'brands': brands,
-    }
-    return render(request, 'sportswear/sportswear_list.html', context)
-
+def delete_brand_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            brand_id = data.get("id")
+            brand = SportswearBrand.objects.get(pk=brand_id)
+            brand.delete()
+            return JsonResponse({'status': 'success'}, status=200)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+  
 @require_GET
 def filter_brands_ajax(request):
     """Endpoint AJAX untuk mencari brand (Web Search Bar)."""
@@ -144,11 +93,19 @@ def filter_brands_ajax(request):
 
 
 # CRUD ADMIN (HTML/AJAX)
+def show_sportswear(request):
+    brands = SportswearBrand.objects.all().order_by('brand_name')
+    for brand in brands:
+        brand.latest_reviews = brand.reviews.all()[:3] 
+        
+    context = {
+        'brands': brands,
+    }
+    return render(request, 'sportswear/sportswear_list.html', context)
 
 #@login_required
 @require_http_methods(["GET", "POST"])
 def add_brand(request):
-    # if not is_admin(request.user): ...
     if request.method == 'POST':
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             form = SportswearBrandForm(request.POST)
@@ -170,7 +127,6 @@ def add_brand(request):
 #@login_required
 @require_http_methods(["GET", "POST"])
 def edit_brand(request, pk):
-    # if not is_admin(request.user): ...
         
     brand = get_object_or_404(SportswearBrand, pk=pk)
     

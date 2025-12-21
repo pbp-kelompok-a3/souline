@@ -13,6 +13,6 @@ urlpatterns = [
     # API Endpoints
     path('api/list/', views.list_brands_api, name='list_brands_api'),
     path('api/create/', views.create_brand_api, name='create_brand_api'), 
-    path('api/update/<int:pk>/', views.update_brand_api, name='update_brand_api'), 
-    path('api/delete/<int:pk>/', views.delete_brand_api, name='delete_brand_api'),
+    path('api/update/', views.update_brand_api, name='update_brand_api'), 
+    path('api/delete/', views.delete_brand_api, name='delete_brand_api'),
 ]
